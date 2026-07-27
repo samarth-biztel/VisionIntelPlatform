@@ -1,0 +1,21 @@
+{
+  "site_id": "biztel-lab",
+  "enabled_modules": [
+    "echo"
+  ],
+  "sources": {
+    "camera.line1": {
+      "kind": "mock",
+      "calibration": "line1-default.json",
+      "target_format": "bgr_1080p"
+    }
+  },
+  "sinks": {
+    "log": {
+      "subscribes": [
+        "result.*",
+        "event.*"
+      ]
+    }
+  }
+}

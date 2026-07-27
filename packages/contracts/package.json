@@ -1,0 +1,13 @@
+{
+  "name": "@biztel/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "node src/contract-smoke-test.js"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

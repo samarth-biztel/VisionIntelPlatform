@@ -1,0 +1,14 @@
+{
+  "device_id": "dev-workstation",
+  "role": "development",
+  "runs": [
+    "core",
+    "mock-source",
+    "log-sink"
+  ],
+  "bus": {
+    "mode": "in-memory",
+    "host": "localhost",
+    "port": 7080
+  }
+}
