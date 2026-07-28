@@ -1,0 +1,717 @@
+{
+  "_comment": "Shared contract conformance corpus. Every language binding runs this exact file and must agree case for case. See LANGUAGES.md section 2 and PROBLEM_STATEMENT.md S8.",
+  "frame_envelope": {
+    "valid": [
+      {
+        "_name": "canonical mock frame",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "mock-frame-000001",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "mock-source",
+        "sequence": 1,
+        "format": {
+          "pixel_format": "BGR8",
+          "width": 1920,
+          "height": 1080,
+          "channels": 3,
+          "bit_depth": 8,
+          "color_space": "BGR"
+        },
+        "calibration": {
+          "calibration_id": "line1-default",
+          "target_format": "bgr_1080p"
+        },
+        "payload": {
+          "transport": "inline_mock",
+          "ref": "synthetic://line1/frame/000001"
+        },
+        "metadata": {}
+      },
+      {
+        "_name": "gige source, shared memory, full calibration",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "line1-000042",
+        "timestamp_utc": "2026-07-28T12:00:00.250Z",
+        "source_topic": "camera.line1",
+        "source_id": "camera-gige-01",
+        "sequence": 42,
+        "format": {
+          "pixel_format": "BAYER_RG8",
+          "width": 2448,
+          "height": 2048,
+          "channels": 1,
+          "bit_depth": 8,
+          "color_space": "RAW"
+        },
+        "calibration": {
+          "calibration_id": "line1-hik-2448",
+          "camera_model": "Hikrobot MV-CA050-10GM",
+          "profile_path": "config/calibration/line1_cam.yaml",
+          "target_format": "bgr_1080p"
+        },
+        "payload": {
+          "transport": "shared_memory",
+          "ref": "shm://line1_frames/7",
+          "byte_length": 5013504,
+          "checksum": "sha256:abc123"
+        },
+        "metadata": { "exposure_us": 4000, "gain_db": 2.5, "triggered": true }
+      },
+      {
+        "_name": "sequence zero is allowed",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f0",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line2",
+        "source_id": "s",
+        "sequence": 0,
+        "format": {
+          "pixel_format": "GRAY8",
+          "width": 640,
+          "height": 480,
+          "channels": 1,
+          "bit_depth": 8,
+          "color_space": "GRAY"
+        },
+        "calibration": { "calibration_id": "c", "target_format": "gray_480p" },
+        "payload": { "transport": "file", "ref": "/tmp/f0.png" },
+        "metadata": {}
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "wrong schema_version",
+        "schema_version": "frame-envelope.v2",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "source_topic is not a camera topic",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "result.echo",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "unknown topic family",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "cam.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "negative sequence",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": -1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "zero width",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 0, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "unknown pixel format",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "YUV422", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "unknown transport",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "grpc_stream", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "missing calibration",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "timestamp without timezone",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "f",
+        "timestamp_utc": "2026-07-28T12:00:00",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      },
+      {
+        "_name": "empty frame_id",
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "s",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1, "height": 1, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "t" },
+        "payload": { "transport": "file", "ref": "r" },
+        "metadata": {}
+      }
+    ]
+  },
+  "result_envelope": {
+    "valid": [
+      {
+        "_name": "minimal pass result",
+        "schema_version": "result-envelope.v1",
+        "result_id": "echo-result-000001",
+        "frame_id": "mock-frame-000001",
+        "source_topic": "camera.line1",
+        "result_topic": "result.echo",
+        "module_id": "echo",
+        "verdict": "pass",
+        "latency_ms": 3,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "ai supervisor result with model provenance",
+        "schema_version": "result-envelope.v1",
+        "result_id": "ais-result-000123",
+        "frame_id": "line1-000042",
+        "source_topic": "camera.line1",
+        "result_topic": "result.ai-supervisor",
+        "module_id": "ai_supervisor",
+        "verdict": "pass",
+        "confidence": 0.87,
+        "latency_ms": 24.5,
+        "model": { "model_id": "ais_x3d", "version": "1.2.0", "runtime_backend": "trt" },
+        "payload": { "coverage_pct": 82.4, "sop_step": 3 },
+        "timestamp_utc": "2026-07-28T12:00:00.300Z"
+      },
+      {
+        "_name": "error verdict carries an error object",
+        "schema_version": "result-envelope.v1",
+        "result_id": "ocr-result-000009",
+        "frame_id": "line1-000043",
+        "source_topic": "camera.line1",
+        "result_topic": "result.ocr",
+        "module_id": "ocr",
+        "verdict": "error",
+        "latency_ms": 0,
+        "error": { "code": "engine_timeout", "message": "Vision Runtime did not respond in 500ms" },
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.800Z"
+      },
+      {
+        "_name": "classical cv backend, confidence at bounds",
+        "schema_version": "result-envelope.v1",
+        "result_id": "bls-result-000001",
+        "frame_id": "line1-000044",
+        "source_topic": "camera.line1",
+        "result_topic": "result.blockline-sequence",
+        "module_id": "blockline_sequence",
+        "verdict": "fail",
+        "confidence": 0,
+        "latency_ms": 12,
+        "model": { "model_id": "blob_detect", "version": "0.3.1", "runtime_backend": "classical_cv" },
+        "payload": { "swapped_pairs": [[2, 5]] },
+        "timestamp_utc": "2026-07-28T12:00:01.000Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "result_topic is not a result topic",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "frame_id": "f",
+        "source_topic": "camera.line1",
+        "result_topic": "camera.line1",
+        "module_id": "m",
+        "verdict": "pass",
+        "latency_ms": 1,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "source_topic is not a camera topic",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "frame_id": "f",
+        "source_topic": "result.echo",
+        "result_topic": "result.echo",
+        "module_id": "m",
+        "verdict": "pass",
+        "latency_ms": 1,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "unknown verdict",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "frame_id": "f",
+        "source_topic": "camera.line1",
+        "result_topic": "result.echo",
+        "module_id": "m",
+        "verdict": "maybe",
+        "latency_ms": 1,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "confidence above 1",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "frame_id": "f",
+        "source_topic": "camera.line1",
+        "result_topic": "result.echo",
+        "module_id": "m",
+        "verdict": "pass",
+        "confidence": 1.5,
+        "latency_ms": 1,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "negative latency",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "frame_id": "f",
+        "source_topic": "camera.line1",
+        "result_topic": "result.echo",
+        "module_id": "m",
+        "verdict": "pass",
+        "latency_ms": -1,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "missing frame_id breaks traceability",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "source_topic": "camera.line1",
+        "result_topic": "result.echo",
+        "module_id": "m",
+        "verdict": "pass",
+        "latency_ms": 1,
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "unknown runtime backend",
+        "schema_version": "result-envelope.v1",
+        "result_id": "r",
+        "frame_id": "f",
+        "source_topic": "camera.line1",
+        "result_topic": "result.echo",
+        "module_id": "m",
+        "verdict": "pass",
+        "latency_ms": 1,
+        "model": { "model_id": "m", "version": "1", "runtime_backend": "openvino" },
+        "payload": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      }
+    ]
+  },
+  "module_manifest": {
+    "valid": [
+      {
+        "_name": "echo logic module",
+        "schema_version": "module-manifest.v1",
+        "module_id": "echo",
+        "display_name": "Echo Module",
+        "version": "0.1.0",
+        "owner": "Samarth",
+        "kind": "logic",
+        "requires": { "input_topics": ["camera.line1"], "models": [], "config_keys": [], "services": [] },
+        "provides": {
+          "result_topics": ["result.echo"],
+          "ui_panel": { "route": "/modules/echo", "mount_slot": "dashboard" }
+        },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      },
+      {
+        "_name": "ai supervisor gpu module needing the vision runtime",
+        "schema_version": "module-manifest.v1",
+        "module_id": "ai_supervisor",
+        "display_name": "AI Supervisor",
+        "version": "0.1.0",
+        "owner": "Chetak",
+        "kind": "vision_gpu",
+        "requires": {
+          "input_topics": ["camera.line1"],
+          "models": ["ais_x3d"],
+          "config_keys": ["site.thresholds.coverage"],
+          "services": ["vision_runtime", "plc"]
+        },
+        "provides": {
+          "result_topics": ["result.ai-supervisor"],
+          "ui_panel": { "route": "/modules/ai-supervisor", "mount_slot": "dashboard" }
+        },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      },
+      {
+        "_name": "module subscribing by wildcard, no ui panel",
+        "schema_version": "module-manifest.v1",
+        "module_id": "crowning",
+        "display_name": "Crowning",
+        "version": "0.1.0",
+        "owner": "Chetak",
+        "kind": "metrology",
+        "requires": { "input_topics": ["camera.*"], "models": [], "config_keys": [], "services": [] },
+        "provides": { "result_topics": ["result.crowning"] },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "publishes to a wildcard result topic",
+        "schema_version": "module-manifest.v1",
+        "module_id": "m",
+        "display_name": "M",
+        "version": "0.1.0",
+        "owner": "o",
+        "kind": "logic",
+        "requires": { "input_topics": ["camera.line1"], "models": [], "config_keys": [], "services": [] },
+        "provides": { "result_topics": ["result.*"] },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      },
+      {
+        "_name": "unknown module kind",
+        "schema_version": "module-manifest.v1",
+        "module_id": "m",
+        "display_name": "M",
+        "version": "0.1.0",
+        "owner": "o",
+        "kind": "audio",
+        "requires": { "input_topics": ["camera.line1"], "models": [], "config_keys": [], "services": [] },
+        "provides": { "result_topics": ["result.m"] },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      },
+      {
+        "_name": "unknown required service",
+        "schema_version": "module-manifest.v1",
+        "module_id": "m",
+        "display_name": "M",
+        "version": "0.1.0",
+        "owner": "o",
+        "kind": "logic",
+        "requires": { "input_topics": ["camera.line1"], "models": [], "config_keys": [], "services": ["kafka"] },
+        "provides": { "result_topics": ["result.m"] },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      },
+      {
+        "_name": "renamed lifecycle method",
+        "schema_version": "module-manifest.v1",
+        "module_id": "m",
+        "display_name": "M",
+        "version": "0.1.0",
+        "owner": "o",
+        "kind": "logic",
+        "requires": { "input_topics": ["camera.line1"], "models": [], "config_keys": [], "services": [] },
+        "provides": { "result_topics": ["result.m"] },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "process(frame)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      },
+      {
+        "_name": "invalid input topic",
+        "schema_version": "module-manifest.v1",
+        "module_id": "m",
+        "display_name": "M",
+        "version": "0.1.0",
+        "owner": "o",
+        "kind": "logic",
+        "requires": { "input_topics": ["Camera.Line1"], "models": [], "config_keys": [], "services": [] },
+        "provides": { "result_topics": ["result.m"] },
+        "lifecycle": {
+          "init": "init(config)",
+          "frame_handler": "on_frame(frame_envelope)",
+          "publish": "publish(result_envelope)",
+          "teardown": "teardown()"
+        }
+      }
+    ]
+  },
+  "inference_request": {
+    "valid": [
+      {
+        "_name": "ai supervisor calling the runtime",
+        "schema_version": "inference-request.v1",
+        "request_id": "req-000001",
+        "module_id": "ai_supervisor",
+        "model_id": "ais_x3d",
+        "frame_id": "line1-000042",
+        "frame_payload_ref": "shm://line1_frames/7",
+        "backend_hint": "trt",
+        "parameters": { "conf": 0.5, "nms": 0.45, "half": true, "profile": "default" },
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "no backend hint, no parameters",
+        "schema_version": "inference-request.v1",
+        "request_id": "req-000002",
+        "module_id": "ocr",
+        "model_id": "ocr_v3",
+        "frame_id": "line1-000043",
+        "frame_payload_ref": "shm://line1_frames/8",
+        "parameters": {},
+        "timestamp_utc": "2026-07-28T12:00:00.100Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "unknown backend hint",
+        "schema_version": "inference-request.v1",
+        "request_id": "r",
+        "module_id": "m",
+        "model_id": "x",
+        "frame_id": "f",
+        "frame_payload_ref": "shm://a/1",
+        "backend_hint": "openvino",
+        "parameters": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "empty payload ref",
+        "schema_version": "inference-request.v1",
+        "request_id": "r",
+        "module_id": "m",
+        "model_id": "x",
+        "frame_id": "f",
+        "frame_payload_ref": "",
+        "parameters": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "missing model_id",
+        "schema_version": "inference-request.v1",
+        "request_id": "r",
+        "module_id": "m",
+        "frame_id": "f",
+        "frame_payload_ref": "shm://a/1",
+        "parameters": {},
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      }
+    ]
+  },
+  "inference_response": {
+    "valid": [
+      {
+        "_name": "tensors returned",
+        "schema_version": "inference-response.v1",
+        "request_id": "req-000001",
+        "model_id": "ais_x3d",
+        "backend": "trt",
+        "latency_ms": 18.2,
+        "tensors": [{ "name": "output0", "dtype": "float32", "shape": [1, 84, 8400] }],
+        "timestamp_utc": "2026-07-28T12:00:00.020Z"
+      },
+      {
+        "_name": "error response with no tensors",
+        "schema_version": "inference-response.v1",
+        "request_id": "req-000003",
+        "model_id": "ais_x3d",
+        "backend": "trt",
+        "latency_ms": 0,
+        "tensors": [],
+        "error": { "code": "engine_not_loaded", "message": "ais_x3d is not in the engine cache" },
+        "timestamp_utc": "2026-07-28T12:00:00.030Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "unknown backend",
+        "schema_version": "inference-response.v1",
+        "request_id": "r",
+        "model_id": "m",
+        "backend": "cuda",
+        "latency_ms": 1,
+        "tensors": [],
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "negative latency",
+        "schema_version": "inference-response.v1",
+        "request_id": "r",
+        "model_id": "m",
+        "backend": "trt",
+        "latency_ms": -5,
+        "tensors": [],
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      }
+    ]
+  },
+  "_round_trip_comment": "JSON is the wire format. Parsing then re-serializing must not change a single value. Added after pydantic's smart-union serializer was caught emitting boolean true as 1.0, which accept/reject cases could never detect. Every key here must survive identically; bindings may add defaults but must not alter these values.",
+  "round_trip": [
+    {
+      "_name": "frame metadata preserves bool vs int vs float vs string",
+      "group": "frame_envelope",
+      "message": {
+        "schema_version": "frame-envelope.v1",
+        "frame_id": "rt-000001",
+        "timestamp_utc": "2026-07-28T12:00:00.000Z",
+        "source_topic": "camera.line1",
+        "source_id": "rt-source",
+        "sequence": 1,
+        "format": { "pixel_format": "BGR8", "width": 1920, "height": 1080, "channels": 3, "bit_depth": 8, "color_space": "BGR" },
+        "calibration": { "calibration_id": "c", "target_format": "bgr_1080p" },
+        "payload": { "transport": "shared_memory", "ref": "shm://line1/7", "byte_length": 6220800 },
+        "metadata": { "triggered": true, "auto_gain": false, "exposure_us": 4000, "gain_db": 2.5, "lot": "A-17" }
+      }
+    },
+    {
+      "group": "inference_request",
+      "_name": "inference parameters preserve bool vs number",
+      "message": {
+        "schema_version": "inference-request.v1",
+        "request_id": "rt-req-1",
+        "module_id": "ai_supervisor",
+        "model_id": "ais_x3d",
+        "frame_id": "rt-000001",
+        "frame_payload_ref": "shm://line1/7",
+        "backend_hint": "trt",
+        "parameters": { "half": true, "verbose": false, "topk": 100, "conf": 0.5, "profile": "default" },
+        "timestamp_utc": "2026-07-28T12:00:00.000Z"
+      }
+    },
+    {
+      "group": "result_envelope",
+      "_name": "result payload preserves nested structure and types",
+      "message": {
+        "schema_version": "result-envelope.v1",
+        "result_id": "rt-res-1",
+        "frame_id": "rt-000001",
+        "source_topic": "camera.line1",
+        "result_topic": "result.ai-supervisor",
+        "module_id": "ai_supervisor",
+        "verdict": "pass",
+        "confidence": 0.824,
+        "latency_ms": 24.5,
+        "model": { "model_id": "ais_x3d", "version": "1.2.0", "runtime_backend": "trt" },
+        "payload": { "coverage_pct": 82.4, "sop_step": 3, "complete": true, "missing_steps": [], "boxes": [[0.1, 0.2, 0.3, 0.4]] },
+        "timestamp_utc": "2026-07-28T12:00:00.300Z"
+      }
+    }
+  ],
+  "topics": {
+    "valid_topics": [
+      "camera.line1",
+      "camera.line-2",
+      "result.echo",
+      "result.ai-supervisor",
+      "event.service.registered",
+      "health.heartbeat",
+      "control.shutdown"
+    ],
+    "invalid_topics": [
+      "Camera.line1",
+      "cam.line1",
+      "camera",
+      "camera.",
+      "camera.-bad",
+      "result.*",
+      "",
+      "camera line1"
+    ],
+    "valid_patterns": ["camera.line1", "result.*", "event.service.*", "camera.*"],
+    "invalid_patterns": ["*", "bogus.*", "result.**", "", "*.echo"],
+    "matches": [
+      ["result.*", "result.echo", true],
+      ["result.*", "result.ai-supervisor", true],
+      ["result.*", "camera.line1", false],
+      ["result.*", "resultx.echo", false],
+      ["camera.line1", "camera.line1", true],
+      ["camera.line1", "camera.line10", false],
+      ["event.service.*", "event.service.registered", true],
+      ["event.service.*", "event.other.thing", false],
+      ["camera.*", "camera.line1", true]
+    ]
+  }
+}

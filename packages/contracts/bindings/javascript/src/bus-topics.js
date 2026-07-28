@@ -20,6 +20,36 @@ export function assertTopic(topic) {
   return topicNameSchema.parse(topic);
 }
 
+const topicPrefixSchema = z
+  .string()
+  .regex(/^(camera|result|control|event|health)(\.[a-z0-9][a-z0-9_.-]*)?$/);
+
+/**
+ * A subscription pattern is either an exact topic (`camera.line1`) or a topic
+ * prefix followed by a trailing wildcard segment (`result.*`, `event.service.*`).
+ */
+export const topicPatternSchema = z.string().refine(
+  (pattern) => {
+    if (pattern.endsWith(".*")) {
+      return topicPrefixSchema.safeParse(pattern.slice(0, -2)).success;
+    }
+    return topicNameSchema.safeParse(pattern).success;
+  },
+  "Pattern must be an exact topic (camera.line1) or a prefix wildcard (result.*)"
+);
+
+export function assertTopicPattern(pattern) {
+  return topicPatternSchema.parse(pattern);
+}
+
+export function topicMatches(pattern, topic) {
+  if (pattern.endsWith(".*")) {
+    const prefix = pattern.slice(0, -2);
+    return topic === prefix || topic.startsWith(`${prefix}.`);
+  }
+  return pattern === topic;
+}
+
 export function topicFamily(topic) {
   const validTopic = assertTopic(topic);
   return validTopic.split(".")[0];

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biztel-contracts"
+version = "0.1.0"
+description = "BiztelAI platform contracts - Python binding"
+readme = "README.md"
+# 3.8 is the JetPack 5.1 floor; see LANGUAGES.md section 3.
+requires-python = ">=3.8"
+dependencies = [
+    "pydantic>=2.0,<3",
+    "typing-extensions>=4.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+include = ["biztel_contracts*"]

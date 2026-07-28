@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { topicNameSchema } from "./bus-topics.js";
+import { topicNameSchema, topicPatternSchema } from "./bus-topics.js";
 
 export const moduleManifestSchema = z.object({
   schema_version: z.literal("module-manifest.v1"),
@@ -9,7 +9,7 @@ export const moduleManifestSchema = z.object({
   owner: z.string().min(1),
   kind: z.enum(["vision_gpu", "vision_classical", "metrology", "logic"]),
   requires: z.object({
-    input_topics: z.array(topicNameSchema),
+    input_topics: z.array(topicPatternSchema),
     models: z.array(z.string()).default([]),
     config_keys: z.array(z.string()).default([]),
     services: z.array(z.enum(["vision_runtime", "plc", "storage"])).default([])

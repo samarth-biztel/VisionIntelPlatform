@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { topicNameSchema } from "./bus-topics.js";
+import { topicNameSchema, topicPatternSchema } from "./bus-topics.js";
 
 export const serviceRoleSchema = z.enum([
   "core",
@@ -26,7 +26,8 @@ export const serviceRegistrationSchema = z.object({
   version: z.string().min(1),
   host_id: z.string().min(1),
   process_id: z.number().int().positive().optional(),
-  subscribes: z.array(topicNameSchema).default([]),
+  // Subscriptions may be wildcards (result.*); publishes is always a concrete topic.
+  subscribes: z.array(topicPatternSchema).default([]),
   publishes: z.array(topicNameSchema).default([]),
   health_topic: topicNameSchema.default("health.heartbeat"),
   started_at_utc: z.string().datetime(),
