@@ -76,9 +76,14 @@ Two people, five products. Any proposal that assumes a platform team doesn't app
 2. **A module never contains GPU machinery — it calls the Vision Runtime.** Machinery (engine
    load/cache, TRT/ONNX exec, GPU memory, batching, generic pre/post) is Layer 1. Meaning (which model,
    when, thresholds, interpretation, bespoke postprocessing) is Layer 2. Modules that load their own
-   engines produce multiple CUDA contexts on one Jetson → OOM.
+   engines produce multiple CUDA contexts on one Jetson → OOM. A module *declares* the model it needs
+   via `requires.models` in its manifest; it never loads one. (This is why "model loading per module"
+   was deleted — see [ARCHITECTURE.md](ARCHITECTURE.md) §5.1.)
 3. **No module calls another module directly.** Ever. Everything goes over the bus.
-4. **The core never touches a frame.** It supervises: config, registry, lifecycle, health, UI shell.
+4. **The core never *interprets* a frame.** Core owns the frame **transport** — shared-memory
+   segments, slot allocation, lifetime, and fan-out (settled 2026-07-28) — but never decodes,
+   inspects, or acts on pixel content. *Moving* the bytes is Core's job; *understanding* them is a
+   module's. It also supervises config, registry, lifecycle, health, and the UI shell.
 5. **Global contracts are the grammar; per-module contracts are the vocabulary.** Global
    (`contracts/`): frame envelope, result envelope, bus topics, service interface, module interface,
    inference contract. Per-module (`modules/<x>/contract/`): its manifest + its own result schema.
@@ -116,9 +121,11 @@ The two things that cost real time on JP5→JP6: finding the JP6 wheels, and the
 
 ## Default language per role
 
-Go (core/platform) · C++ or Python (Vision Runtime — the one genuinely per-platform piece) · Python
-(ML/vision modules) · any language (logic modules like Crowning) · Rust or C++ (hot data path) · Tauri
-= web frontend + Rust shell (desktop UI).
+**Rust** (core/platform — supervisor *and* the shared-memory hot path, which Core owns) · C++ or Python
+(Vision Runtime — the one genuinely per-platform piece) · Python (ML/vision modules) · any language
+(logic modules like Crowning) · Tauri = web frontend + Rust shell (desktop UI).
+
+Full policy, including which contract needs which binding: [LANGUAGES.md](LANGUAGES.md).
 
 They coexist because the **bus contract is the only thing they share** — messages, never code.
 
@@ -161,8 +168,11 @@ us** — prototype it before committing the UI stack, or consider Qt.
 **Write the four unblocking Tier 0 schemas:** frame envelope, result envelope, service interface, module
 interface. They unblock all parallel work. Full build order: [CONTEXT.md](CONTEXT.md) §6.
 
-Two cheap decisions with outsized downstream effect, worth settling alongside:
-- **Does Core own frame transport?** Pure control plane → Go. Also owning shared-memory frames → leans
-  Rust. This is the one branch that could change Core's language, and it should be settled before Core
-  is written.
-- **Collapse the three overlapping model-loading items** into one (see [CONTEXT.md](CONTEXT.md) §11.2).
+- ~~**Does Core own frame transport?**~~ **Settled 2026-07-28: yes.** Core owns the shared-memory hot
+  path, which makes Core **Rust** and absorbs the separate "hot data path" role. See
+  [LANGUAGES.md](LANGUAGES.md) §1.
+- ~~**Collapse the three overlapping model-loading items.**~~ **Settled 2026-07-28:** GPU-free **Model
+  Registry** (catalog/version/compatibility/artifact selection, P0, Python) + Vision Runtime **engine
+  cache** (loading/CUDA/sharing, P1). **Per-module model loading deleted.** Registry selects from a
+  config box-profile; the runtime verifies against its linked TensorRT. See
+  [ARCHITECTURE.md](ARCHITECTURE.md) §5.1.

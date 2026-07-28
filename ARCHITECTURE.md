@@ -38,7 +38,8 @@ never changes to a module's logic.
 
 It is not "core + modules." There are five distinct kinds of thing:
 
-1. **Core** — the control plane / host app. Supervises. **Never touches a frame.**
+1. **Core** — the control plane / host app. Supervises, **and owns the shared-memory frame
+   transport** (settled 2026-07-28). It moves frame bytes; it **never interprets them.**
 2. **Source services** — data producers. Capture → **normalize to a canonical format** → publish to a
    topic. Whatever the physical camera, downstream sees one identical frame format.
 3. **Module services** — the products. Subscribe → process → publish results.
@@ -56,7 +57,7 @@ Plus the **bus** (dumb transport) and **contracts** (the shared language everyon
 | Component | Owns | Knows nothing about |
 |---|---|---|
 | **Bus** | Transport only — fans messages out by topic | Any logic |
-| **Core** | Config, lifecycle, registry, health, UI shell | Frame contents |
+| **Core** | Config, lifecycle, registry, health, UI shell, **shared-memory frame transport** | Frame *contents* — it carries pixels without ever reading them |
 | **Source service** | Grabbing frames, **normalizing to canonical format**, publishing camera topic | Anything downstream; what a module's model expects |
 | **Module service** | Subscribe → process → publish result; *which* model, thresholds, meaning | GPU/engine plumbing, other modules, sinks |
 | **Sink service** | Subscribe to results → act (PLC/DB/alert) | Which module produced the result |
@@ -89,6 +90,8 @@ AI Supervisor still "runs its model" — it decides and interprets. It just does
 | Concern | Layer |
 |---|---|
 | Knowing *which* model to use (`ais_x3d`) | **2 — App / Module** |
+| Model catalog: version, checksum, artifact set, I/O spec | **1 — Platform (Model Registry)** |
+| Picking *which artifact file* fits this box | **1 — Platform (Model Registry)**, from a Layer 3 profile |
 | Engine load, GPU alloc, context creation | **1 — Platform (Vision Runtime)** |
 | Engine cache (keyed, shared, warmed once) | **1 — Platform (Vision Runtime)** |
 | TensorRT / ONNX execution | **1 — Platform (Vision Runtime)** |
@@ -102,6 +105,48 @@ AI Supervisor still "runs its model" — it decides and interprets. It just does
 
 **The rule:** product logic → Layer 2; shared GPU/engine plumbing → Layer 1; config selects between
 them.
+
+### 5.1 Model Registry vs. engine cache — two components, not one
+
+*Settled 2026-07-28. This resolves the three-way overlap recorded in [CONTEXT.md](CONTEXT.md) §11.2.*
+
+"Model loading" was being planned in three places at once. It decomposes into exactly **two**
+components with nothing in common but the word *model*, plus one that must not exist:
+
+| Component | Answers | GPU? | Layer |
+|---|---|---|---|
+| **Model Registry** | *"What is `ais_x3d`?"* — version, checksum, artifact set, I/O spec, which artifact fits this box | **No** | 1 (platform, GPU-free) |
+| **Engine cache** | *"Give me a runnable engine"* — loaded once, shared, warmed, owns the CUDA context | **Yes** | 1 (Vision Runtime) |
+| ~~Per-module model loading~~ | — | — | **Deleted** |
+
+**Per-module model loading is deleted, not rebuilt.** A module that loads its own engine creates a
+second CUDA context and GPU pool on a shared Jetson — that is P3's OOM failure and a direct violation
+of the "a module never contains GPU machinery" invariant. The legitimate part — *declaring* which model
+a module needs — is already covered by `requires.models` in the module manifest, so it costs no code.
+
+**Artifact resolution: the registry picks, the runtime verifies.** Config declares the box profile
+(TRT version, GPU arch, JetPack); the registry selects the matching artifact from its catalog; the
+runtime asserts on load that the artifact really matches the TensorRT it is linked against, and fails
+loudly on mismatch.
+
+```
+device.json: gpu_profile { trt: 10, arch: sm_87 }
+      ▼
+Registry:  ais_x3d v1.2.0 ─▶ ais_x3d_trt10_fp16.engine   (selection)
+      ▼
+Runtime:   assert artifact.trt == linked TRT  ─▶ load ─▶ cache   (verification)
+```
+
+This keeps *"config selects; it does not translate"* (§11) intact and leaves the runtime dumb, which is
+what makes the port a version firewall. The runtime's assert exists because a config profile can drift
+from the box's reality — the registry is the decision, the runtime is the safety net.
+
+**Why the registry is worth its own component:** it is GPU-free, so it is fully testable with no
+hardware attached, and it is what makes the result envelope's `model {model_id, version,
+runtime_backend}` trustworthy — the chain success test **S11** depends on.
+
+The **Dataset / Model Training Pipeline** is separate from both: it *produces* artifacts that the
+registry catalogs. It does not overlap.
 
 ### The call, concretely
 
@@ -189,8 +234,9 @@ network transparently. **Local vs. distributed is a config decision, not a code 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │                        CONTROL PLANE (CORE)                          │
-│   config · registry · lifecycle · health/heartbeat · UI shell        │
-│   (supervises everything below — never touches a frame)              │
+│  config · registry · lifecycle · health/heartbeat · UI shell ·       │
+│  shared-memory frame transport                                       │
+│  (supervises everything below — carries frames, never reads them)    │
 └──────────────────────────────────────────────────────────────────────┘
         │ starts / monitors / mounts panels        ▲ register + heartbeat
         ▼                                          │
@@ -432,14 +478,20 @@ flexible.
 Modules can be written in **any language** because they only speak the bus wire format — nothing links
 another component's code. Each role's constraints pick a natural default:
 
+> **Canonical language policy now lives in [LANGUAGES.md](LANGUAGES.md).** This table is kept in sync
+> with it; if the two ever disagree, LANGUAGES.md wins.
+
 | Role | Language | Why |
 |---|---|---|
-| Core / platform | **Go** | Fast, light, cross-compiles to a single native binary for Ubuntu + Windows + Jetson ARM; cheap concurrency for supervising services |
+| Core / platform (supervisor **+ frame transport**) | **Rust** | Core owns the shared-memory hot path (settled 2026-07-28), so it must be a systems language; Rust adds memory safety on the component everything depends on, and cross-compiles to Ubuntu + Windows + Jetson ARM |
 | Vision Runtime (GPU) | **C++ or Python** | Bound to CUDA/TRT; the one genuinely per-platform piece |
 | ML / vision modules | **Python** | The ML ecosystem lives here; calls the Vision Runtime for heavy work |
 | QC / logic modules (e.g. Crowning) | **Any** | Pure logic — Python to build fast, Go/Rust if it must be light |
-| Hot data path (shared-memory frames) | **C++ or Rust** | Performance-critical transport |
 | Desktop UI | **Tauri** (web frontend + Rust shell) | Native window (no browser), light (OS webview, not bundled Chromium), cross-platform |
+
+The former separate "hot data path (C++ or Rust)" row is **absorbed into Core**, since Core now owns
+that path. This lowers the language count rather than raising it — a direct win against the polyglot
+cost in §4 / P13.
 
 They coexist because the **bus contract** is the only thing they share — a Go core, a C++ runtime,
 Python modules, and a Rust-shelled UI exchange messages, never code. Cross-compilation

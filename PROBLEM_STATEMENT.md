@@ -154,9 +154,9 @@ operational load — build tooling, debugging, onboarding — for two people.
 - Per-site variation must be expressible in config alone.
 
 **Negotiable**
-- Language per role (current defaults: Go core, Python modules, C++/Python runtime, Rust hot path,
-  Tauri UI) — see P13.
-- Whether Core also owns frame transport, or only the control plane.
+- Language per role (current defaults: **Rust core**, Python modules, C++/Python runtime, Tauri UI) —
+  see P13 and [LANGUAGES.md](LANGUAGES.md).
+- ~~Whether Core also owns frame transport, or only the control plane.~~ **Settled: Core owns it.**
 - Vision Runtime repo shape — separate repo vs. in-tree.
 - Whether the camera SDK is promoted behind a port.
 - Deployment topology per module.
@@ -219,9 +219,11 @@ Stated now so they aren't discovered as failures later.
 
 Unresolved, and each blocks or reshapes work downstream.
 
-1. **Does Core own frame transport?** Pure control plane → Go is clearly right. Also owning the
-   shared-memory frame path → leans Rust. This is the one branch that could change Core's language,
-   and it should be settled before Core is written.
+1. ~~**Does Core own frame transport?**~~ **RESOLVED 2026-07-28 — yes, Core owns it.** Consequences:
+   Core is a hot-path component, so its language is **Rust** (not Go), and the separate "hot data
+   path" role is absorbed into Core. The invariant "the core never touches a frame" is restated as
+   **"the core never *interprets* a frame"** — it owns the shared-memory pipe, not the meaning of the
+   pixels in it. See [LANGUAGES.md](LANGUAGES.md) §1.
 2. **Where does the Vision Runtime sit in the startup order?** The current sequence is
    sources → sinks → modules; the Runtime and its port are unplaced.
 3. **Vision Runtime repo shape.** Described as "its own repo/process," drawn in-tree. Pick one.
@@ -231,8 +233,15 @@ Unresolved, and each blocks or reshapes work downstream.
    environment. Data residency decides it, and hasn't been established.
 6. **Camera SDK behind a port?** Only justified if the Windows x86 target becomes real. It already
    publishes by topic, so it can be promoted later without touching a module — deferrable.
-7. **How narrow should the language spread be?** See P13. A conscious decision beats drift.
-8. **Which model-loading component actually exists?** Three overlapping candidates are planned
-   (platform-level model management, per-module model loading, runtime engine cache) while the design
-   assigns engine load/cache unambiguously to the runtime layer. Two of the three should be merged or
-   dropped before any is built. See [CONTEXT.md](CONTEXT.md) §7.
+7. **How narrow should the language spread be?** See P13. *Partially addressed 2026-07-28:*
+   [LANGUAGES.md](LANGUAGES.md) now records the policy, and the Core-owns-transport decision **removed**
+   a language by absorbing the C++/Rust hot-path role into a Rust core. Current spread: Rust (core) ·
+   Python (modules, registry, contracts) · C++ or Python (Vision Runtime) · Tauri/Rust (UI, deferred).
+   Still open: whether the Vision Runtime is C++ *or* Python — picking Python would cut the spread again.
+8. ~~**Which model-loading component actually exists?**~~ **RESOLVED 2026-07-28.** Two survive, one is
+   deleted: a GPU-free **Model Registry** (catalog, versioning, compatibility, artifact selection —
+   P0) and the Vision Runtime's **engine cache** (loading, CUDA context, sharing — P1).
+   **Per-module model loading is deleted**, since it is exactly P3's OOM failure mode; declaring a
+   model is already covered by the module manifest's `requires.models`. The registry selects the
+   artifact from a config box-profile and the runtime verifies it on load. See
+   [ARCHITECTURE.md](ARCHITECTURE.md) §5.1.

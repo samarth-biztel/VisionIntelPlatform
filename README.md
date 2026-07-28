@@ -20,6 +20,7 @@ Instead:
 | Root documentation | ✅ Available |
 | Codebase | 🟡 Started |
 | Samarth-owned implementation | 🟢 First slice implemented |
+| Chetak-owned contracts (Tier 0) | 🟢 Python binding implemented |
 | Chetak-owned CV/GPU implementation | 🔴 Not started |
 | Real hardware integration | 🔴 Not started |
 
@@ -33,8 +34,8 @@ Currently implemented Samarth-owned platform items:
 
 | Item | Status | Location | Notes |
 |---|---:|---|---|
-| **Bus topic naming convention** | ✅ Implemented | `packages/contracts/src/bus-topics.js` | Validates topic families like `camera.*`, `result.*`, `control.*`, `event.*`, `health.*` |
-| **Service interface** | ✅ Implemented | `packages/contracts/src/service-interface.js` | Defines `register`, `heartbeat`, `shutdown`, and service health/state contracts |
+| **Bus topic naming convention** | ✅ Implemented | `bindings/*/bus-topics` | Validates topic families like `camera.*`, `result.*`, `control.*`, `event.*`, `health.*`, plus subscription patterns |
+| **Service interface** | ✅ Implemented | `bindings/javascript/src/service-interface.js` | Defines `register`, `heartbeat`, `shutdown`, and service health/state contracts |
 
 Service interface coverage:
 
@@ -78,8 +79,13 @@ control-plane surface before real cameras, models, PLCs, or databases are added.
 │   └── site.json            # Site/module/source configuration
 ├── packages/
 │   └── contracts/           # Global schemas and platform contracts
+│       ├── fixtures/        #   Shared corpus — the truth every binding obeys
+│       └── bindings/        #   One per consuming language; none is primary
+│           ├── javascript/  #     Zod — core API, operator UI
+│           └── python/      #     Pydantic — modules, Vision Runtime
 ├── ARCHITECTURE.md          # Chosen architecture
 ├── CONTEXT.md               # Current state, build order, tracker notes
+├── LANGUAGES.md             # Which language each role uses, and why
 ├── MEMORY.md                # Durable facts and invariants
 ├── PROBLEM_STATEMENT.md     # Why this platform exists
 └── README.md
@@ -107,14 +113,25 @@ The most important rule:
 
 ## 🧾 Current Contracts
 
-| Contract | Status | File |
-|---|---:|---|
-| Bus topics | ✅ | `packages/contracts/src/bus-topics.js` |
-| Frame envelope | ✅ | `packages/contracts/src/frame-envelope.js` |
-| Result envelope | ✅ | `packages/contracts/src/result-envelope.js` |
-| Service interface | ✅ | `packages/contracts/src/service-interface.js` |
-| Module interface / manifest | ✅ | `packages/contracts/src/module-interface.js` |
-| Inference contract | ✅ | `packages/contracts/src/inference-contract.js` |
+Contracts are not a single language — each consuming role gets a **binding**, and all bindings are
+held to one shared fixture corpus. See [LANGUAGES.md](LANGUAGES.md) §2.
+
+| Contract | Owner | JS (core, UI) | Python (modules, runtime) |
+|---|---|---:|---:|
+| Bus topics | Samarth | ✅ | ✅ |
+| Frame envelope | Chetak | ✅ | ✅ |
+| Result envelope | Chetak | ✅ | ✅ |
+| Service interface | Samarth | ✅ | ⏳ |
+| Module interface / manifest | Chetak | ✅ | ✅ + `Module` base class |
+| Inference contract | Chetak | ✅ | ✅ |
+
+**Conformance:** `packages/contracts/fixtures/conformance.json` holds 74 shared valid/invalid cases.
+Both bindings run the same file and must agree case for case; a binding that drifts fails its build
+naming the exact case. This is success test **S8**.
+
+```bash
+npm run test --workspace @biztel/contracts    # runs both bindings
+```
 
 ---
 
@@ -198,6 +215,7 @@ The current UI follows the requested visual direction:
 | `PROBLEM_STATEMENT.md` | The problem, constraints, non-goals, success tests |
 | `ARCHITECTURE.md` | The chosen architecture and boundaries |
 | `CONTEXT.md` | Build order, tracker state, reuse inventory |
+| `LANGUAGES.md` | Language per role, contract bindings, current deviations |
 | `MEMORY.md` | Durable facts and invariants |
 
 Read these before making major architectural changes.

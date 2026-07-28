@@ -73,9 +73,13 @@ Do not re-litigate these without a reason that touches
   the port + inference contract act as a **version firewall**. Frames move via **shared memory**, not
   serialized over a socket.
 
-**Stack**
-Go (core/platform) · C++ or Python (Vision Runtime) · Python (ML/vision modules) · any language (logic
-modules like Crowning) · Rust or C++ (hot data paths) · Tauri (desktop UI).
+**Stack** — full policy in [LANGUAGES.md](LANGUAGES.md)
+**Rust** (core/platform — supervisor *and* the shared-memory hot path) · C++ or Python (Vision Runtime)
+· Python (ML/vision modules) · any language (logic modules like Crowning) · Tauri (desktop UI).
+
+- **Core owns frame transport** (settled 2026-07-28). Core moves frame bytes but never interprets
+  them; that decision is what makes Core Rust rather than Go, and it absorbs the former separate
+  "hot data path" role.
 
 ---
 
@@ -87,8 +91,8 @@ modules like Crowning) · Rust or C++ (hot data paths) · Tauri (desktop UI).
   concrete per-module decisions.
 - **Online delivery model:** "hosted in our cloud, give the customer a link" vs. "shipped into the
   customer's own environment" (data residency). Unresolved.
-- **Core scope:** pure control plane (→ Go, clearly right) vs. also owning the shared-memory frame
-  transport (→ leans Rust). This is the one branch point that could tip the core's language.
+- ~~**Core scope**~~ — **settled 2026-07-28, moved to §3:** Core owns the shared-memory frame
+  transport, which makes Core **Rust**.
 - **Polyglot cost:** the full Go + Python + C++ + Rust + web spread is powerful but heavy for two
   people. Consciously narrowing (lean Python where not forced otherwise) is worth considering.
 
@@ -131,8 +135,13 @@ split works before touching real camera or model code.
 GigE source · OpenCV/USB source (reuse from blockline-sequence) · normalize stage · PLC sink ·
 storage/history sink · per-OS Dockerfile.
 
+**Model Registry** also belongs here, not Tier 3: it is P0, GPU-free, and fully testable with no
+hardware, so it does not need to wait for the Vision Runtime. It is what the engine cache calls to
+resolve an artifact. (Python — see [LANGUAGES.md](LANGUAGES.md).)
+
 ### Tier 3 — Vision Runtime
-Backend abstraction (trt/onnx/torch) · engine cache · GPU memory pool · batching scheduler · generic
+Backend abstraction (trt/onnx/torch) · engine cache (calls the Model Registry to resolve artifacts,
+then verifies them against its linked TensorRT) · GPU memory pool · batching scheduler · generic
 pre/post processing · port layer (version firewall).
 
 ### Tier 4 — Modules
@@ -191,9 +200,9 @@ mock/simulated state) · `1230-biztel-app` (has real GigE camera reconnect logic
 
 **P0 — core infra, needed by both AI Supervisor and Image Inspection**
 Configuration Framework · Configuration Validation · Configuration Versioning · Event Framework ·
-Runtime State Framework (Starting/Running/Degraded/Error/Stopped) · Module Context API · Model
-Management (lightweight) · Structured Logging Framework · Metrics Framework · Health Monitoring
-Framework.
+Runtime State Framework (Starting/Running/Degraded/Error/Stopped) · Module Context API · **Model
+Registry** (GPU-free catalog — renamed from "Model Management (lightweight)", see §11.2) · Structured
+Logging Framework · Metrics Framework · Health Monitoring Framework.
 
 **Added from gap analysis**
 | Item | Priority | Owner | Why |
@@ -205,7 +214,7 @@ Framework.
 | Watchdog / Auto-Recovery | P0 | Samarth | Closes the gap between detecting a bad state and responding to it |
 | Audit Trail / Traceability | P1 | Samarth | Common QC/industrial compliance need — cheaper now than retrofitted |
 | Alerting / Notification | P1 | Samarth | Health Monitoring detects; this decides who gets told and how |
-| Dataset / Model Training Pipeline | P2 | Chetak | Distinct from runtime Model Management |
+| Dataset / Model Training Pipeline | P2 | Chetak | Distinct from the runtime Model Registry — it *produces* the artifacts the registry catalogs |
 | Documentation Framework | P2 | Samarth | Lets a third person build a module without asking Chetak or Samarth |
 
 ---
@@ -348,10 +357,17 @@ sheet is used to assign work.
    Logging, and Metrics are plainly platform-wide shared infra, not two-product-specific. The column is
    duplicating Category rather than distinguishing anything.
 
-2. **Three overlapping model-loading items.** "Model Management (Lightweight)" (Platform Frameworks, P0,
-   Chetak), "Model loading (per module)" (Module Services, P1, Chetak, Rewrite), and "Engine cache"
-   (Vision Runtime, P1, Chetak) — while [ARCHITECTURE.md](ARCHITECTURE.md) §5 assigns engine load/cache
-   unambiguously to Layer 1. Decide which of the three exists before building any of them.
+2. ~~**Three overlapping model-loading items.**~~ **RESOLVED 2026-07-28.** Collapsed to two components
+   plus one deletion — full reasoning in [ARCHITECTURE.md](ARCHITECTURE.md) §5.1:
+   - **"Model Management (Lightweight)" → rename to "Model Registry."** Keeps catalog, versioning,
+     compatibility, artifact selection. **Loses "loading"** — that was the collision. GPU-free, stays
+     **P0**, buildable now.
+   - **"Engine cache" → unchanged**, Vision Runtime, Layer 1, P1 with Tier 3.
+   - **"Model loading (per module)" → DELETE the row.** It is P3's OOM failure and violates the
+     "a module never contains GPU machinery" invariant. Its legitimate part (declaring which model)
+     already exists as `requires.models` in the module manifest — no code needed.
+   - **Artifact resolution:** registry selects from a config-declared box profile; the runtime asserts
+     the artifact matches its linked TensorRT and fails loudly on mismatch.
 
 3. **A P1-depends-on-P1 ordering risk.** All 6 Vision Runtime rows are P1, and AI Supervisor /
    Image Inspection module logic are also P1 — but those modules *call* the Runtime for all GPU work.
@@ -402,10 +418,20 @@ cleanup hasn't been done.
 
 ## 13. Immediate next action
 
-**Write the four unblocking Tier 0 schemas** — frame envelope, result envelope, service interface,
-module interface — as plain schema files. Everything else can be built in parallel against them once
-they exist.
+~~**Write the four unblocking Tier 0 schemas.**~~ **Done (2026-07-28).** Frame envelope, result
+envelope, service interface, and module interface all exist, in two bindings (JS + Python) held to a
+shared 77-case fixture corpus. The Tier 1 skeleton loop (mock source → echo module → log sink) runs
+and is covered by an automated test.
 
-Before or alongside that, two cheap decisions with outsized downstream effect:
-- Settle **whether Core owns frame transport** (§4) — it determines Core's language.
-- Collapse the **three model-loading items** into one (§11.2) — it determines who builds what in Tier 3.
+Remaining cheap decision with outsized downstream effect:
+- Collapse the **three model-loading items** into one (§11.2) — it determines who builds what in
+  Tier 3. Still open.
+
+~~Settle whether Core owns frame transport.~~ **Resolved 2026-07-28: Core owns it → Core is Rust.**
+See [LANGUAGES.md](LANGUAGES.md) §1.
+
+**Next real work, in order:**
+1. Python binding for the **service interface** (the one contract Python still lacks).
+2. Decide the model-loading collapse (§11.2) — blocks Tier 3.
+3. Port `apps/api` to Rust when Core grows real supervision or transport logic — not before; order in
+   [LANGUAGES.md](LANGUAGES.md) §4.
