@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "build": "node src/server.js --check"
+    "test": "node src/tier1-loop-test.js",
+    "build": "node src/tier1-loop-test.js && node src/server.js --check"
   },
   "dependencies": {
     "@biztel/contracts": "file:../../packages/contracts",

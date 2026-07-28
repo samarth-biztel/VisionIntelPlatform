@@ -21,7 +21,7 @@ app.use(express.json({ limit: "1mb" }));
 const config = await loadPlatformConfig();
 const registry = new ServiceRegistry();
 const bus = new InMemoryBus();
-seedRuntime(registry, bus, config);
+const runtime = seedRuntime(registry, bus, config, { verbose: !shouldCheckOnly });
 
 app.get("/api/health", (_request, response) => {
   response.json({
@@ -127,6 +127,27 @@ app.post("/api/validate/result", (request, response, next) => {
   }
 });
 
+app.post("/api/source/capture", (_request, response, next) => {
+  try {
+    const frame = runtime.source.captureOnce();
+    response.status(202).json({
+      frame_id: frame.frame_id,
+      topic: frame.source_topic,
+      results: runtime.logSink.recent(1)
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/sink/log", (_request, response) => {
+  response.json({
+    sink_id: "log-sink",
+    count: runtime.logSink.count,
+    entries: runtime.logSink.recent(10)
+  });
+});
+
 app.post("/api/bus/publish", (request, response, next) => {
   try {
     const payload = z
@@ -146,6 +167,14 @@ app.use((error, _request, response, _next) => {
     response.status(400).json({
       error: "contract_validation_failed",
       issues: error.issues
+    });
+    return;
+  }
+
+  if (typeof error.status === "number") {
+    response.status(error.status).json({
+      error: error.code,
+      message: error.message
     });
     return;
   }

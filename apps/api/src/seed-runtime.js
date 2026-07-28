@@ -1,6 +1,13 @@
 import { canonicalTopics } from "@biztel/contracts";
+import { createEchoModule, echoManifest } from "./services/echo-module.js";
+import { createLogSink } from "./services/log-sink.js";
+import { createMockSource } from "./services/mock-source.js";
 
-export function seedRuntime(registry, bus, config) {
+/**
+ * Boots the Tier 1 skeleton loop: mock source -> echo module -> log sink.
+ * Everything below talks over the bus by topic only.
+ */
+export function seedRuntime(registry, bus, config, { verbose = true } = {}) {
   const now = new Date().toISOString();
 
   registry.registerService({
@@ -57,40 +64,62 @@ export function seedRuntime(registry, bus, config) {
     }
   });
 
-  registry.registerModule({
-    schema_version: "module-manifest.v1",
-    module_id: "echo",
-    display_name: "Echo Module",
+  registry.registerService({
+    schema_version: "service-registration.v1",
+    service_id: "log-sink",
+    display_name: "Log Sink",
+    role: "sink",
     version: "0.1.0",
-    owner: "Samarth",
-    kind: "logic",
-    requires: {
-      input_topics: [canonicalTopics.cameraLine1],
-      models: [],
-      config_keys: ["site.enabled_modules"],
-      services: []
-    },
-    provides: {
-      result_topics: ["result.echo"],
-      ui_panel: {
-        route: "/modules/echo",
-        mount_slot: "dashboard"
-      }
-    },
-    lifecycle: {
-      init: "init(config)",
-      frame_handler: "on_frame(frame_envelope)",
-      publish: "publish(result_envelope)",
-      teardown: "teardown()"
-    }
+    host_id: config.device.device_id,
+    subscribes: ["result.*"],
+    publishes: [],
+    started_at_utc: now,
+    metadata: {}
   });
 
-  bus.subscribe("echo", canonicalTopics.cameraLine1);
-  bus.subscribe("log-sink", "result.*");
+  registry.heartbeat({
+    schema_version: "service-heartbeat.v1",
+    service_id: "log-sink",
+    state: "running",
+    timestamp_utc: now,
+    uptime_ms: 0,
+    metrics: {}
+  });
+
+  registry.registerModule(echoManifest);
+
+  registry.registerService({
+    schema_version: "service-registration.v1",
+    service_id: "echo",
+    display_name: "Echo Module",
+    role: "module",
+    version: "0.1.0",
+    host_id: config.device.device_id,
+    subscribes: echoManifest.requires.input_topics,
+    publishes: echoManifest.provides.result_topics,
+    started_at_utc: now,
+    metadata: {}
+  });
+
+  registry.heartbeat({
+    schema_version: "service-heartbeat.v1",
+    service_id: "echo",
+    state: "running",
+    timestamp_utc: now,
+    uptime_ms: 0,
+    metrics: {}
+  });
+
+  const source = createMockSource({ bus });
+  const echo = createEchoModule({ bus }).init();
+  const logSink = createLogSink({ bus, verbose }).init();
+
   bus.publish({
     topic: canonicalTopics.eventServiceRegistered,
     payload: {
       service_id: "core"
     }
   });
+
+  return { source, echo, logSink };
 }

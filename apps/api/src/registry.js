@@ -3,6 +3,7 @@ import {
   moduleManifestSchema,
   serviceRegistrationSchema
 } from "@biztel/contracts";
+import { NotFoundError } from "./errors.js";
 
 export class ServiceRegistry {
   constructor() {
@@ -26,7 +27,9 @@ export class ServiceRegistry {
     const heartbeat = heartbeatSchema.parse(payload);
     const current = this.services.get(heartbeat.service_id);
     if (!current) {
-      throw new Error(`Unknown service: ${heartbeat.service_id}`);
+      throw new NotFoundError(
+        `Unknown service: ${heartbeat.service_id}. Register it before sending a heartbeat.`
+      );
     }
     const record = {
       ...current,
