@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 0 0% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --border: 240 6% 90%;
+    --primary: 0 0% 4%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 0 0% 4%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 35%;
+    --accent: 244 76% 49%;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 6% 10%;
+    --card-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 239 84% 67%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    min-width: 320px;
+    margin: 0;
+    font-family: Inter, system-ui, sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+}
+
+@layer base {
+  html {
+    --theme-toggle-x: 100vw;
+    --theme-toggle-y: 0px;
+    --theme-transition-radius: 120vmax;
+  }
+
+  body,
+  aside,
+  header,
+  section,
+  button,
+  input,
+  kbd {
+    transition:
+      background-color 260ms ease,
+      border-color 260ms ease,
+      color 260ms ease,
+      box-shadow 260ms ease;
+  }
+
+  html[data-theme-transition="active"] body,
+  html[data-theme-transition="active"] aside,
+  html[data-theme-transition="active"] header,
+  html[data-theme-transition="active"] section,
+  html[data-theme-transition="active"] button,
+  html[data-theme-transition="active"] input,
+  html[data-theme-transition="active"] kbd {
+    transition: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 520ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(root) {
+    animation-name: theme-fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation-name: theme-reveal;
+  }
+
+  @keyframes theme-reveal {
+    from {
+      clip-path: circle(0 at var(--theme-toggle-x) var(--theme-toggle-y));
+    }
+    to {
+      clip-path: circle(var(--theme-transition-radius) at var(--theme-toggle-x) var(--theme-toggle-y));
+    }
+  }
+
+  @keyframes theme-fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body,
+    aside,
+    header,
+    section,
+    button,
+    input,
+    kbd {
+      transition: none;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+}

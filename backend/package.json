@@ -1,0 +1,22 @@
+{
+  "name": "biztel-vision-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "test": "node src/tier1-loop-test.js",
+    "build": "npm run build --workspace @biztel/contracts && node src/tier1-loop-test.js && node src/server.js --check"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@biztel/contracts": "file:./packages/contracts",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "zod": "^3.23.8"
+  }
+}
