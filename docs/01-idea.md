@@ -2,7 +2,7 @@
 
 ## What We Are Building
 
-BiztelAI Vision Intel Platform is a modular computer-vision operations platform. It runs multiple inspection, inference, metrology, and logic modules over shared camera streams without every module needing to know about every other service.
+Vision Intel Platform is a modular computer-vision operations platform. It runs multiple inspection, inference, metrology, and logic modules over shared camera streams without every module needing to know about every other service.
 
 The core idea is simple:
 
@@ -26,7 +26,7 @@ The core idea is simple:
 | Plant operator | See whether the platform is alive, healthy, and ready |
 | Vision engineer | Register modules, inspect topics, validate envelopes, resolve dependencies |
 | Backend engineer | Extend services without breaking contracts |
-| Deployment owner | Configure devices/sites and ship frontend/backend independently |
+| Deployment lead | Configure devices/sites and ship frontend/backend independently |
 
 ## Current Experience
 

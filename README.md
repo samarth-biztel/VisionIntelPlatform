@@ -1,4 +1,4 @@
-# 🧠 BiztelAI Vision Intel Platform
+# 🧠 Vision Intel Platform
 
 A deployable vision-intelligence platform skeleton split into two application folders: a backend platform core and a frontend operator dashboard.
 

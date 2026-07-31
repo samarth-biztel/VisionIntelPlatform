@@ -1,4 +1,4 @@
-"""BiztelAI platform contracts -- Python binding.
+"""Vision Intel Platform contracts -- Python binding.
 
 The global language every component obeys. This is the Python binding, one of
 several under ``packages/contracts/bindings/`` -- no binding is primary. Every

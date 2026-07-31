@@ -76,14 +76,12 @@ export async function createApp({ checkOnly = false } = {}) {
         shutdown: lifecycle.shutdownPlan()
       },
       dependencies: dependencies(),
-      samarth_queue: [
+      platform_scope: [
         "Manifest needs/provides spec",
         "Publish/subscribe bus",
         "Service registration",
         "Heartbeat alive-check",
-        "Startup/shutdown sequencing",
-        "Config loading (device.yaml / site.yaml)",
-        "Dependency checking"
+        "Startup/shutdown sequencing"
       ]
     });
   });

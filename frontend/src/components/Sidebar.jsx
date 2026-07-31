@@ -9,14 +9,8 @@ const navItems = [
 
 export function Sidebar({ activeView, collapsed, onSelectView, onToggle }) {
   return (
-    <aside className="hidden border-r border-border bg-card md:flex md:min-h-screen md:flex-col">
-      <div className={`flex h-20 items-center border-b border-border px-5 ${collapsed ? "justify-center" : "justify-between"}`}>
-        {!collapsed && (
-          <div>
-            <p className="font-display text-xl font-black tracking-normal">BiztelAI</p>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Platform</p>
-          </div>
-        )}
+    <aside className="hidden h-screen min-h-0 border-r border-border bg-card md:flex md:flex-col">
+      <div className={`flex h-20 shrink-0 items-center border-b border-border px-5 ${collapsed ? "justify-center" : "justify-end"}`}>
         <button
           className="grid size-10 shrink-0 place-items-center border border-border bg-background hover:-translate-y-0.5 active:scale-95"
           data-testid="sidebar-toggle"
@@ -28,7 +22,7 @@ export function Sidebar({ activeView, collapsed, onSelectView, onToggle }) {
           {collapsed ? <PanelLeftOpen size={18} strokeWidth={1.7} /> : <PanelLeftClose size={18} strokeWidth={1.7} />}
         </button>
       </div>
-      <nav className={`grid gap-2 p-4 ${collapsed ? "justify-items-center" : ""}`}>
+      <nav className={`min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 ${collapsed ? "grid content-start justify-items-center gap-2" : "grid content-start gap-2"}`}>
         {navItems.map(({ id, label, icon: Icon, testId }) => {
           const active = activeView === id;
           return (

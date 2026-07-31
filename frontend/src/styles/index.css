@@ -17,7 +17,7 @@
     --secondary-foreground: 0 0% 4%;
     --muted: 240 5% 96%;
     --muted-foreground: 240 4% 35%;
-    --accent: 244 76% 49%;
+    --accent: 145 68% 36%;
   }
 
   .dark {
@@ -32,16 +32,23 @@
     --secondary-foreground: 0 0% 98%;
     --muted: 240 4% 16%;
     --muted-foreground: 240 5% 65%;
-    --accent: 239 84% 67%;
+    --accent: 145 65% 48%;
   }
 
   * {
     border-color: hsl(var(--border));
   }
 
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
   body {
     min-width: 320px;
     margin: 0;
+    overflow: hidden;
     font-family: Inter, system-ui, sans-serif;
     background: hsl(var(--background));
     color: hsl(var(--foreground));

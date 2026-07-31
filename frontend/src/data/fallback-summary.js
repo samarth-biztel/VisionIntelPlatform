@@ -71,7 +71,25 @@ export const fallbackSummary = {
       }
     ]
   },
-  lifecycle: {
+  dependencies: {
+    ok: true,
+    checked_at_utc: new Date().toISOString(),
+    summary: {
+      total: 5,
+      passed: 5,
+      failed: 0
+    },
+    failed: [],
+    modules: [
+      {
+        module_id: "echo",
+        display_name: "Echo Module",
+        ready: true,
+        checks: []
+      }
+    ],
+    checks: []
+  },  lifecycle: {
     startup: {
       order: [
         { service_id: "core", role: "core", state: "running", alive: true },
@@ -91,7 +109,7 @@ export const fallbackSummary = {
     },
     shutdown: []
   },
-  samarth_queue: [
+  platform_scope: [
     "Manifest needs/provides spec",
     "Publish/subscribe bus",
     "Service registration",

@@ -1,4 +1,4 @@
-﻿# BiztelAI Platform â€” Memory
+# Vision Intel Platform â€” Memory
 
 **Last updated:** 2026-07-25
 
@@ -151,9 +151,9 @@ us** â€” prototype it before committing the UI stack, or consider Qt.
 
 ## Environment facts
 
-- **Working dir:** `/home/biztelai/Projects/BiztelAI Platform` â€” **not a git repository.** No history, no
+- **Working dir:** `/home/vision-intel/Projects/Vision Intel Platform` â€” **not a git repository.** No history, no
   branches, no diffs. Be careful with overwrites; there is nothing to recover from.
-- **Tracker:** `BiztelAI_Module_Tracker(1).xlsx` â€” 2 sheets (`Module Tracker` with 95 data rows +
+- **Tracker:** `Vision Intel Platform_Module_Tracker(1).xlsx` â€” 2 sheets (`Module Tracker` with 95 data rows +
   header, `Legend` with 16 rows).
 - **`openpyxl` is not installed** (pandas 2.0.3 is, but can't read xlsx without it). To read the
   tracker: unzip the xlsx and parse the XML directly with `xml.etree`. Note the workbook has **no
@@ -176,6 +176,3 @@ interface. They unblock all parallel work. Full build order: [CONTEXT.md](CONTEX
   cache** (loading/CUDA/sharing, P1). **Per-module model loading deleted.** Registry selects from a
   config box-profile; the runtime verifies against its linked TensorRT. See
   [ARCHITECTURE.md](ARCHITECTURE.md) Â§5.1.
-
-
-

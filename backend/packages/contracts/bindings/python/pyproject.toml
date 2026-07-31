@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "biztel-contracts"
 version = "0.1.0"
-description = "BiztelAI platform contracts - Python binding"
+description = "Vision Intel Platform contracts - Python binding"
 readme = "README.md"
 # 3.8 is the JetPack 5.1 floor; see LANGUAGES.md section 3.
 requires-python = ">=3.8"

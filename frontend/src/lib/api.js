@@ -16,3 +16,18 @@ export async function fetchDashboardSummary() {
     };
   }
 }
+
+export async function runLifecycleAction(action) {
+  const response = await fetch(`${apiBaseUrl}/api/lifecycle/${action}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ requested_by: "operator" })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: "Lifecycle action failed" }));
+    throw new Error(error.message ?? "Lifecycle action failed");
+  }
+
+  return response.json();
+}

@@ -1,4 +1,4 @@
-﻿# BiztelAI Platform â€” Context & Current State
+# Vision Intel Platform â€” Context & Current State
 
 **Last updated:** 2026-07-25 Â· **Team:** Chetak (CV/AI/ML) + Samarth (web/app)
 
@@ -221,7 +221,7 @@ Logging Framework Â· Metrics Framework Â· Health Monitoring Framework.
 
 ## 10. The tracker
 
-**File:** `BiztelAI_Module_Tracker(1).xlsx` Â· 2 sheets (`Module Tracker`, `Legend`) Â· **95 data rows**.
+**File:** `Vision Intel Platform_Module_Tracker(1).xlsx` Â· 2 sheets (`Module Tracker`, `Legend`) Â· **95 data rows**.
 Columns: **Module/Page Â· Category Â· Commonality Â· Status Â· Developed By Â· Priority Â· Description Â·
 Why Needed Now**.
 
@@ -407,8 +407,8 @@ history:
 |---|---|
 | `memory/factory-vision-architecture.md` | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | `memory/hehe.md` | â€” byte-identical duplicate of the above |
-| `memory/BiztelAI_Platform_Context.md` | this file (Â§6â€“Â§10) |
-| `memory/biztelai-platform-context.md` | this file (Â§3â€“Â§5) |
+| `memory/Vision Intel Platform_Platform_Context.md` | this file (Â§6â€“Â§10) |
+| `memory/vision-intel-platform-context.md` | this file (Â§3â€“Â§5) |
 
 Note that the two old context files differ only by filename case; they coexist on Linux but would
 collide on Windows or macOS. Deleting the `memory/` drafts is safe once these four are trusted â€” that
@@ -435,6 +435,3 @@ See [LANGUAGES.md](LANGUAGES.md) Â§1.
 2. Decide the model-loading collapse (Â§11.2) â€” blocks Tier 3.
 3. Port `apps/api` to Rust when Core grows real supervision or transport logic â€” not before; order in
    [LANGUAGES.md](LANGUAGES.md) Â§4.
-
-
-

@@ -1,4 +1,4 @@
-﻿# BiztelAI Platform â€” Problem Statement
+# Vision Intel Platform â€” Problem Statement
 
 **Status:** draft Â· **Owners:** Chetak (CV/AI/ML) + Samarth (web/app) Â· **Last updated:** 2026-07-25
 
@@ -245,6 +245,3 @@ Unresolved, and each blocks or reshapes work downstream.
    model is already covered by the module manifest's `requires.models`. The registry selects the
    artifact from a config box-profile and the runtime verifies it on load. See
    [ARCHITECTURE.md](ARCHITECTURE.md) Â§5.1.
-
-
-

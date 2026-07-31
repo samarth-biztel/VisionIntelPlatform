@@ -9,6 +9,6 @@ if (shouldCheckOnly) {
   console.log("api: ok");
 } else {
   app.listen(port, () => {
-    console.log(`BiztelAI core API listening on http://localhost:${port}`);
+    console.log(`Vision Intel Platform core API listening on http://localhost:${port}`);
   });
 }

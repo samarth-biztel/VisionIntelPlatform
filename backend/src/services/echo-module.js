@@ -5,7 +5,7 @@ export const echoManifest = Object.freeze({
   module_id: "echo",
   display_name: "Echo Module",
   version: "0.1.0",
-  owner: "Samarth",
+  owner: "Vision Intel Platform",
   kind: "logic",
   needs: {
     input_topics: ["camera.line1"],
@@ -88,4 +88,3 @@ export function createEchoModule({ bus, manifest = echoManifest }) {
 
   return module;
 }
-

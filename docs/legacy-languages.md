@@ -1,4 +1,4 @@
-﻿# BiztelAI Platform â€” Language Policy
+# Vision Intel Platform â€” Language Policy
 
 **Status:** binding Â· **Last updated:** 2026-07-28
 
@@ -135,7 +135,7 @@ binding comes first so the JS and Rust cores can be compared against one corpus 
 
 ## 5. Do not take language from the tracker spreadsheet
 
-`BiztelAI_Module_Tracker(1).xlsx` / the exported CSV has `Role`, `Language`, and `Why` columns. **They
+`Vision Intel Platform_Module_Tracker(1).xlsx` / the exported CSV has `Role`, `Language`, and `Why` columns. **They
 are a paste artifact and carry no per-row meaning.** Only 6 of 95 rows are filled, and those 6 are
 exactly the six rows of the table in Â§1 above, pasted into adjacent columns starting at row 1. They
 line up with the Contracts rows by position alone.
@@ -145,6 +145,3 @@ Read literally, the sheet claims the frame envelope schema is written in **Go**,
 
 **This file is the authority on language, not the spreadsheet.** Either clear those three columns in
 the tracker or replace them with a real per-row language field derived from Â§1.
-
-
-

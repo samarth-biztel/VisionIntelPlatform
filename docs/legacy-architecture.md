@@ -1,4 +1,4 @@
-﻿# BiztelAI Platform â€” Architecture
+# Vision Intel Platform â€” Architecture
 
 **Status:** design settled, unbuilt Â· **Owners:** Chetak (CV/AI/ML) + Samarth (web/app) Â· **Last updated:** 2026-07-25
 
@@ -513,6 +513,3 @@ its lighter OS-webview form.
 > streaming live 30fps feeds with overlays needs a deliberate approach (local stream to the UI, or a
 > native video layer). It's the one thing to prototype early if the operator screen must show live
 > video. Industrial HMIs heavy on live feeds sometimes prefer **Qt** for this reason.
-
-
-
