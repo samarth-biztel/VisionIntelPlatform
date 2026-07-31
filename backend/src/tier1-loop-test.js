@@ -11,15 +11,18 @@ import { InMemoryBus } from "./in-memory-bus.js";
 import { ServiceRegistry } from "./registry.js";
 import { seedRuntime } from "./seed-runtime.js";
 import { NotFoundError } from "./errors.js";
+import { checkPlatformDependencies } from "./dependency-checker.js";
 
 const config = {
-  device: { device_id: "test-box", bus: { mode: "in-memory" } },
-  site: { site_id: "test-site", enabled_modules: ["echo"] }
+  device: { device_id: "test-box", bus: { mode: "in-memory" }, runs: ["core"] },
+  site: { site_id: "test-site", enabled_modules: ["echo"], sources: {}, sinks: {} },
+  loaded_from: { device: "test", site: "test" }
 };
 
 const registry = new ServiceRegistry();
 const bus = new InMemoryBus();
-const { source, logSink } = seedRuntime(registry, bus, config, { verbose: false });
+const runtime = seedRuntime(registry, bus, config, { verbose: false });
+const { source, logSink } = runtime;
 
 // One frame in, one result out, correlated by frame_id.
 const frame = source.captureOnce();
@@ -46,7 +49,7 @@ assert.equal(logSink.count, 2, "an invalid frame must not produce a result");
 source.captureOnce();
 assert.equal(logSink.count, 3, "the loop must survive a subscriber failure");
 
-// Sinks never learn who produced a result — only the topic.
+// Sinks never learn who produced a result, only the topic.
 assert.equal(
   bus.snapshot().subscribers.find((s) => s.service_id === "log-sink").topics[0],
   "result.*"
@@ -64,5 +67,9 @@ assert.throws(
     }),
   NotFoundError
 );
+
+const dependencyReport = checkPlatformDependencies({ registry, config });
+assert.equal(dependencyReport.ok, true, "seed runtime dependencies must pass");
+assert.equal(dependencyReport.modules.find((module) => module.module_id === "echo").ready, true);
 
 console.log("tier1 loop: ok");

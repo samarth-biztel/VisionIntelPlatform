@@ -13,6 +13,13 @@ function serviceHasRole(services, role) {
   return services.some((service) => service.role === role && service.alive && service.state === "running");
 }
 
+function sortServices(services, order) {
+  return [...services].sort((a, b) => {
+    const roleDelta = roleRank(a.role, order) - roleRank(b.role, order);
+    return roleDelta || a.service_id.localeCompare(b.service_id);
+  });
+}
+
 export class LifecycleOrchestrator {
   constructor({ registry, bus, runtimeServices = {} }) {
     this.registry = registry;
@@ -25,14 +32,12 @@ export class LifecycleOrchestrator {
     const modules = this.registry.listModules();
 
     return {
-      order: [...services]
-        .sort((a, b) => roleRank(a.role, ROLE_START_ORDER) - roleRank(b.role, ROLE_START_ORDER))
-        .map((service) => ({
-          service_id: service.service_id,
-          role: service.role,
-          state: service.state,
-          alive: service.alive
-        })),
+      order: sortServices(services, ROLE_START_ORDER).map((service) => ({
+        service_id: service.service_id,
+        role: service.role,
+        state: service.state,
+        alive: service.alive
+      })),
       modules: modules.map((manifest) => this.moduleReadiness(manifest.module_id))
     };
   }
@@ -61,14 +66,59 @@ export class LifecycleOrchestrator {
   }
 
   shutdownPlan() {
-    return [...this.registry.listServices()]
-      .sort((a, b) => roleRank(a.role, ROLE_STOP_ORDER) - roleRank(b.role, ROLE_STOP_ORDER))
-      .map((service) => ({
-        service_id: service.service_id,
-        role: service.role,
-        state: service.state,
-        alive: service.alive
-      }));
+    return sortServices(this.registry.listServices(), ROLE_STOP_ORDER).map((service) => ({
+      service_id: service.service_id,
+      role: service.role,
+      state: service.state,
+      alive: service.alive
+    }));
+  }
+
+  requestStartup({ service_id, requested_by = "core" }) {
+    const current = this.registry.getService(service_id);
+    if (!current) {
+      throw new NotFoundError(`Unknown service: ${service_id}`);
+    }
+    if (current.state === "running" && current.alive) {
+      return {
+        service: current,
+        action: "skipped",
+        message: "service already running"
+      };
+    }
+
+    this.registry.markStarting(service_id, `startup requested by ${requested_by}`);
+    const runtime = this.runtimeServices[service_id];
+    runtime?.init?.();
+    runtime?.start?.();
+    const service = this.registry.markRunning(service_id);
+
+    this.bus.publish({
+      topic: "event.service.started",
+      payload: {
+        service_id,
+        requested_by,
+        timestamp_utc: new Date().toISOString()
+      }
+    });
+
+    return {
+      service,
+      action: "started",
+      message: runtime ? "runtime start hook completed" : "registry state marked running"
+    };
+  }
+
+  startupAll({ requested_by = "core" } = {}) {
+    const results = [];
+    for (const service of sortServices(this.registry.listServices(), ROLE_START_ORDER)) {
+      results.push(this.requestStartup({ service_id: service.service_id, requested_by }));
+    }
+    return {
+      started_at_utc: new Date().toISOString(),
+      results,
+      startup_plan: this.startupPlan()
+    };
   }
 
   requestShutdown({ service_id, reason, requested_by = "core" }) {
@@ -90,6 +140,31 @@ export class LifecycleOrchestrator {
 
     this.bus.publish({ topic: "control.shutdown", payload: command });
     this.runtimeServices[service_id]?.teardown?.();
+    this.runtimeServices[service_id]?.stop?.();
     return this.registry.markStopped(service_id, reason);
+  }
+
+  shutdownAll({ reason = "ordered shutdown", requested_by = "core" } = {}) {
+    const results = [];
+    for (const service of sortServices(this.registry.listServices(), ROLE_STOP_ORDER)) {
+      if (service.state === "stopped") {
+        results.push({
+          service,
+          action: "skipped",
+          message: "service already stopped"
+        });
+        continue;
+      }
+      results.push({
+        service: this.requestShutdown({ service_id: service.service_id, reason, requested_by }),
+        action: "stopped",
+        message: "shutdown command published"
+      });
+    }
+    return {
+      stopped_at_utc: new Date().toISOString(),
+      results,
+      shutdown_plan: this.shutdownPlan()
+    };
   }
 }

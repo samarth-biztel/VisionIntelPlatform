@@ -7,6 +7,7 @@ import {
   resultEnvelopeSchema
 } from "@biztel/contracts";
 import { loadPlatformConfig } from "./config-loader.js";
+import { checkPlatformDependencies } from "./dependency-checker.js";
 import { InMemoryBus } from "./in-memory-bus.js";
 import { LifecycleOrchestrator } from "./lifecycle-orchestrator.js";
 import { ServiceRegistry } from "./registry.js";
@@ -30,6 +31,7 @@ export async function createApp({ checkOnly = false } = {}) {
       [runtime.logSink.sink_id]: runtime.logSink
     }
   });
+  const dependencies = () => checkPlatformDependencies({ registry, config });
 
   app.get("/api/health", (_request, response) => {
     response.json({
@@ -65,19 +67,23 @@ export async function createApp({ checkOnly = false } = {}) {
       config: {
         device_id: config.device.device_id,
         site_id: config.site.site_id,
-        enabled_modules: config.site.enabled_modules
+        enabled_modules: config.site.enabled_modules,
+        loaded_from: config.loaded_from
       },
       bus: bus.snapshot(),
       lifecycle: {
         startup: lifecycle.startupPlan(),
         shutdown: lifecycle.shutdownPlan()
       },
+      dependencies: dependencies(),
       samarth_queue: [
         "Manifest needs/provides spec",
         "Publish/subscribe bus",
         "Service registration",
         "Heartbeat alive-check",
-        "Startup/shutdown sequencing"
+        "Startup/shutdown sequencing",
+        "Config loading (device.yaml / site.yaml)",
+        "Dependency checking"
       ]
     });
   });
@@ -147,12 +153,39 @@ export async function createApp({ checkOnly = false } = {}) {
     }
   });
 
+  app.get("/api/dependencies", (_request, response) => {
+    response.json(dependencies());
+  });
+
   app.get("/api/lifecycle/startup-plan", (_request, response) => {
     response.json(lifecycle.startupPlan());
   });
 
+  app.post("/api/lifecycle/startup", (request, response, next) => {
+    try {
+      response.status(202).json(
+        lifecycle.startupAll({ requested_by: request.body?.requested_by ?? "operator" })
+      );
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/lifecycle/shutdown-plan", (_request, response) => {
     response.json({ services: lifecycle.shutdownPlan() });
+  });
+
+  app.post("/api/lifecycle/shutdown", (request, response, next) => {
+    try {
+      response.status(202).json(
+        lifecycle.shutdownAll({
+          reason: request.body?.reason ?? "operator request",
+          requested_by: request.body?.requested_by ?? "operator"
+        })
+      );
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.post("/api/validate/frame", (request, response, next) => {
@@ -252,5 +285,3 @@ export async function createApp({ checkOnly = false } = {}) {
 
   return { app, config, registry, bus, runtime, lifecycle };
 }
-
-

@@ -1,4 +1,4 @@
-﻿# 📜 Contracts
+# 📜 Contracts
 
 ## Why Contracts Exist
 
@@ -35,18 +35,30 @@ Example shape:
   "owner": "Samarth",
   "kind": "logic",
   "needs": {
-    "input_topics": ["camera.line1"],
-    "models": [],
-    "config_keys": ["site.enabled_modules"],
-    "services": []
+### "input_topics": ["camera.line1"],
+### "models": [],
+### "config_keys": ["site.enabled_modules"],
+### "services": []
   },
   "provides": {
-    "result_topics": ["result.echo"]
+### "result_topics": ["result.echo"]
   }
 }
 ```
 
 `requires` is still accepted as a legacy alias, but `needs` is the preferred language.
+
+## Dependency Checks
+
+The backend dependency checker reads registered services, module manifests, and loaded platform config. It reports whether:
+
+- `device.runs` services are present and running.
+- `site.enabled_modules` have registered manifests.
+- Manifest `needs.services` roles have running services.
+- Manifest `needs.input_topics` have registered publishers.
+- Manifest `needs.config_keys` exist in loaded config.
+
+The report is exposed through `/api/dependencies` and included in `/api/dashboard-summary`.
 
 ## Topic Families
 
@@ -55,7 +67,7 @@ Example shape:
 | `camera` | `camera.line1` | Frame input streams |
 | `result` | `result.echo` | Module outputs |
 | `health` | `health.heartbeat` | Alive checks |
-| `event` | `event.service.registered` | Platform events |
+| `event` | `event.service.registered`, `event.service.started` | Platform events |
 | `control` | `control.shutdown` | Operator/core commands |
 
 ## Wildcard Subscriptions
@@ -66,17 +78,13 @@ The bus supports exact topics and prefix wildcard patterns:
 |---|---|
 | `camera.line1` | Only `camera.line1` |
 | `result.*` | `result.echo`, `result.ocr`, `result.ai-supervisor` |
-| `event.service.*` | `event.service.registered`, `event.service.unhealthy` |
+| `event.service.*` | `event.service.registered`, `event.service.unhealthy`, `event.service.started` |
 
 ## Language Bindings
 
 | Binding | Location | Status |
 |---|---|---|
-| JavaScript | ackend/packages/contracts/bindings/javascript | ✅ Active |
-| Python | ackend/packages/contracts/bindings/python | ✅ Schema binding present |
+| JavaScript | `backend/packages/contracts/bindings/javascript` | Active |
+| Python | `backend/packages/contracts/bindings/python` | Schema binding present |
 
 The JavaScript contract conformance test runs in backend builds. Python verification requires a Python environment with Pydantic installed.
-
-
-
-

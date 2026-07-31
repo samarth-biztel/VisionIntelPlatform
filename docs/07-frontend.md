@@ -1,8 +1,8 @@
-﻿# 🎛️ Frontend
+# 🎛️ Frontend
 
 ## Purpose
 
-The frontend is the operator dashboard for the Vision Intel Platform. It gives a fast visual read of service health, registry state, bus activity, lifecycle order, and deployment settings.
+The frontend is the operator dashboard for the Vision Intel Platform. It gives a fast visual read of service health, registry state, bus activity, lifecycle order, dependency status, and deployment settings.
 
 ## Folder Structure
 
@@ -15,12 +15,12 @@ frontend/
 +-- postcss.config.js
 +-- vercel.json
 +-- src/
-    +-- App.jsx
-    +-- main.jsx
-    +-- components/
-    +-- data/
-    +-- lib/
-    +-- styles/
+### +-- App.jsx
+### +-- main.jsx
+### +-- components/
+### +-- data/
+### +-- lib/
+### +-- styles/
 ```
 
 ## Commands
@@ -36,10 +36,30 @@ frontend/
 
 | View | Purpose |
 |---|---|
-| Dashboard | Full overview of services, modules, bus, contracts, lifecycle |
+| Dashboard | Full overview of services, modules, bus, contracts, lifecycle, and dependencies |
 | Registry | Focused view of services, contracts, and module count |
 | Health | Alive-check status and lifecycle sequencing |
-| Settings | Device/site config and deployment details |
+| Settings | Device/site config, loaded config source files, and deployment details |
+
+## Dashboard Data Contract
+
+The frontend primarily reads:
+
+```text
+/api/dashboard-summary
+```
+
+The summary includes:
+
+| Field | Purpose |
+|---|---|
+| `registry` | Counts of healthy, degraded, error, stopped, service, and module records |
+| `services` | Decorated service records with heartbeat freshness |
+| `modules` | Registered module manifests |
+| `config` | Device/site identity, enabled modules, and loaded config source files |
+| `bus` | Retained messages, subscribers, and transport snapshot |
+| `lifecycle` | Startup and shutdown plans |
+| `dependencies` | Platform dependency report |
 
 ## Design System
 
@@ -74,6 +94,3 @@ http://localhost:7080
 ## Offline Fallback
 
 If the API is unavailable, the frontend renders `frontend/src/data/fallback-summary.js` and marks the dashboard as local fallback. This keeps the interface inspectable during frontend-only work.
-
-
-

@@ -1,11 +1,11 @@
-﻿# 🧠 BiztelAI Vision Intel Platform
+# 🧠 BiztelAI Vision Intel Platform
 
-A deployable vision-intelligence platform skeleton split into exactly two application folders:
+A deployable vision-intelligence platform skeleton split into two application folders: a backend platform core and a frontend operator dashboard.
 
 | Folder | Purpose | Deploy Target |
 |---|---|---|
-| [`backend/`](./backend/) | Core API, service registry, pub/sub bus, heartbeats, lifecycle orchestration, contracts | Vercel Serverless Functions or Node server |
-| [`frontend/`](./frontend/) | React operator dashboard for platform state, registry, health, and settings | Vercel Static Site |
+| [`backend/`](./backend/) | Core API, service registry, pub/sub bus, heartbeats, config loading, dependency checks, lifecycle orchestration, contracts | Vercel Serverless Functions or Node server |
+| [`frontend/`](./frontend/) | React operator dashboard for platform state, registry, health, lifecycle, and settings | Vercel Static Site |
 | [`docs/`](./docs/) | Product, architecture, stack, deployment, and technical documentation | Project knowledge base |
 
 ## 🚀 Quick Start
@@ -44,10 +44,10 @@ http://localhost:5173
 |---|---|
 | [💡 Idea](./docs/01-idea.md) | Product vision, users, and platform purpose |
 | [🧩 Problem](./docs/02-problem.md) | Why this platform exists and what pain it solves |
-| [🏗️ Architecture](./docs/03-architecture.md) | Folder structure, runtime layers, and data flow |
+| [🏗️ Architecture](./docs/03-architecture.md) | Folder structure, runtime layers, data flow, lifecycle flow |
 | [🛠️ Tech Stack](./docs/04-tech-stack.md) | Frontend, backend, contracts, tooling, and deployment stack |
 | [📜 Contracts](./docs/05-contracts.md) | Manifest spec, frame/result envelopes, topics, services, heartbeats |
-| [🖥️ Backend](./docs/06-backend.md) | API routes, bus, registry, lifecycle, local commands |
+| [🖥️ Backend](./docs/06-backend.md) | API routes, bus, registry, config, dependency checks, lifecycle |
 | [🎛️ Frontend](./docs/07-frontend.md) | Dashboard views, design system, theme transition, API config |
 | [🗄️ Database](./docs/08-database.md) | Current persistence status and future database plan |
 | [☁️ Deployment](./docs/09-deployment.md) | Vercel deployment options for frontend and backend |
@@ -62,7 +62,9 @@ http://localhost:5173
 | Publish/subscribe messaging bus | ✅ Done | `backend/src/in-memory-bus.js` |
 | Service registration | ✅ Done | `backend/src/registry.js` |
 | Heartbeat / alive-check | ✅ Done | `backend/src/registry.js`, `backend/src/seed-runtime.js` |
-| Startup/shutdown sequencing | ✅ Done | `backend/src/lifecycle-orchestrator.js` |
+| Startup/shutdown sequencing | ✅ Done | `backend/src/lifecycle-orchestrator.js`, `/api/lifecycle/*` |
+| Config loading (device.yaml / site.yaml) | ✅ Done | `backend/src/config-loader.js`, `backend/config/*.yaml` |
+| Dependency checking | ✅ Done | `backend/src/dependency-checker.js`, `/api/dependencies` |
 
 ## ✅ Verification
 
@@ -87,4 +89,3 @@ npm run build
 +-- frontend/
 +-- docs/
 ```
-

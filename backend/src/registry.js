@@ -45,6 +45,52 @@ export class ServiceRegistry {
     return this.decorateService(record);
   }
 
+  markStarting(serviceId, message = "startup requested") {
+    const current = this.services.get(serviceId);
+    if (!current) {
+      throw new NotFoundError(`Unknown service: ${serviceId}`);
+    }
+    const record = {
+      ...current,
+      state: "starting",
+      stopped_reason: null,
+      last_heartbeat: {
+        schema_version: "service-heartbeat.v1",
+        service_id: serviceId,
+        state: "starting",
+        timestamp_utc: new Date().toISOString(),
+        uptime_ms: current.last_heartbeat?.uptime_ms ?? 0,
+        message,
+        metrics: current.last_heartbeat?.metrics ?? {}
+      }
+    };
+    this.services.set(serviceId, record);
+    return this.decorateService(record);
+  }
+
+  markRunning(serviceId, metrics = {}) {
+    const current = this.services.get(serviceId);
+    if (!current) {
+      throw new NotFoundError(`Unknown service: ${serviceId}`);
+    }
+    const startedAt = Date.parse(current.started_at_utc);
+    const record = {
+      ...current,
+      state: "running",
+      stopped_reason: null,
+      last_heartbeat: {
+        schema_version: "service-heartbeat.v1",
+        service_id: serviceId,
+        state: "running",
+        timestamp_utc: new Date().toISOString(),
+        uptime_ms: Number.isNaN(startedAt) ? 0 : Math.max(0, Date.now() - startedAt),
+        metrics: { ...(current.last_heartbeat?.metrics ?? {}), ...metrics }
+      }
+    };
+    this.services.set(serviceId, record);
+    return this.decorateService(record);
+  }
+
   markStopped(serviceId, reason) {
     const current = this.services.get(serviceId);
     if (!current) {

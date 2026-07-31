@@ -1,8 +1,8 @@
-﻿# 🗄️ Database
+# 🗄️ Database
 
 ## Current Status
 
-The current platform does **not** require a database to run.
+The current platform does not require a database to run.
 
 | Data | Current Storage |
 |---|---|
@@ -10,7 +10,8 @@ The current platform does **not** require a database to run.
 | Module registry | In-memory Map |
 | Heartbeats | In-memory latest heartbeat per service |
 | Bus messages | In-memory retained message list |
-| Config | JSON files under `backend/config` |
+| Config | YAML preferred under `backend/config`, with JSON/default fallbacks |
+| Dependency reports | Computed in memory from registry, manifests, and config |
 | Dashboard fallback | Static JS object in frontend |
 
 This is intentional for the P0 platform core. It keeps the first version easy to run, test, and deploy.
@@ -34,6 +35,8 @@ A database becomes useful when the platform needs persistence across restarts.
 | Module manifests | `modules` |
 | Heartbeat history | `service_heartbeats` |
 | Bus event log | `bus_messages` |
+| Dependency snapshots | `dependency_checks` |
+| Lifecycle actions | `lifecycle_events` |
 | Captured frames | `frames` |
 | Module results | `results` |
 | Operator actions | `audit_log` |
@@ -56,6 +59,8 @@ PostgreSQL
   +-- services
   +-- modules
   +-- service_heartbeats
+  +-- dependency_checks
+  +-- lifecycle_events
   +-- frames
   +-- results
   +-- audit_log
@@ -70,6 +75,3 @@ Redis or NATS
 ## Important Design Rule
 
 The database should not replace contracts. Contracts still define the wire format. The database should store validated contract data after it crosses the platform boundary.
-
-
-

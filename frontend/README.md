@@ -1,4 +1,4 @@
-﻿# 🎛️ Frontend
+# 🎛️ Frontend
 
 The frontend is the React operator dashboard for the Vision Intel Platform.
 
@@ -18,6 +18,7 @@ The frontend is the React operator dashboard for the Vision Intel Platform.
 npm install
 npm run dev
 npm run build
+npm run preview
 ```
 
 ## 🌐 Local URL
@@ -34,7 +35,6 @@ For separate Vercel deployments, set:
 VITE_API_BASE_URL=https://your-backend-domain.vercel.app
 ```
 
+The dashboard reads `/api/dashboard-summary`, which now includes config source metadata, dependency status, and lifecycle plans.
+
 More details: [Frontend docs](../docs/07-frontend.md)
-
-
-
