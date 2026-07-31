@@ -1,8 +1,10 @@
-# 🎛️ Frontend
+# Frontend
 
 ## Purpose
 
 The frontend is the operator dashboard for the Vision Intel Platform. It gives a fast visual read of service health, registry state, bus activity, lifecycle order, dependency status, and deployment settings.
+
+Per [legacy-languages.md](legacy-languages.md), the desktop UI target is Tauri: this React/Vite app is the web frontend half, and the Rust shell is deferred.
 
 ## Folder Structure
 

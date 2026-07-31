@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "bindings/javascript/src/index.js",
+  "main": "bindings/javascript/index.js",
   "scripts": {
     "test": "node run-conformance.js",
-    "test:python": "python3 bindings/python/conformance_test.py",
-    "build": "node bindings/javascript/src/contract-smoke-test.js && node run-conformance.js"
+    "test:python": "python bindings/python/conformance_test.py",
+    "build": "node bindings/javascript/contract-smoke-test.js && node run-conformance.js"
   },
   "dependencies": {
     "zod": "^3.23.8"

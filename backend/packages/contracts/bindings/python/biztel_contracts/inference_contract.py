@@ -1,6 +1,6 @@
 """Inference contract -- the module to Vision Runtime wire format.
 
-Owner: Chetak. Python binding of ``src/inference-contract.js``.
+Owner: Chetak. This is the Python binding of the shared inference schema.
 
 This contract does double duty (ARCHITECTURE.md section 13):
 
@@ -19,7 +19,7 @@ but the shared-memory transport is unbuilt -- so this stays flexible rather than
 committing to a slot/segment layout that the Runtime has not validated yet.
 Tighten it when Tier 3 starts.
 
-Targets Python 3.8; see LANGUAGES.md section 3.
+Targets Python 3.8; see docs/legacy-languages.md.
 """
 from typing import Any, Dict, List, Optional, Union
 

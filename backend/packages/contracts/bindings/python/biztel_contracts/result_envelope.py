@@ -1,13 +1,13 @@
 """Result envelope -- what every module publishes after processing a frame.
 
 Owner: Chetak. Consumed by ML/vision modules (producers) and sinks + UI
-(consumers). Python binding of ``src/result-envelope.js``.
+(consumers). This is the Python binding of the shared schema.
 
 A sink never learns which module produced a result -- it subscribes to a topic.
 The envelope carries ``frame_id`` so any result traces back to its frame, its
 source, and its model version (success test S11).
 
-Targets Python 3.8; see LANGUAGES.md section 3.
+Targets Python 3.8; see docs/legacy-languages.md.
 """
 from typing import Any, Dict, Optional
 

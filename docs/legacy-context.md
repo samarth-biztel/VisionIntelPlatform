@@ -73,7 +73,7 @@ Do not re-litigate these without a reason that touches
   the port + inference contract act as a **version firewall**. Frames move via **shared memory**, not
   serialized over a socket.
 
-**Stack** â€” full policy in [LANGUAGES.md](LANGUAGES.md)
+**Stack** â€” full policy in [legacy-languages.md](legacy-languages.md)
 **Rust** (core/platform â€” supervisor *and* the shared-memory hot path) Â· C++ or Python (Vision Runtime)
 Â· Python (ML/vision modules) Â· any language (logic modules like Crowning) Â· Tauri (desktop UI).
 
@@ -137,7 +137,7 @@ storage/history sink Â· per-OS Dockerfile.
 
 **Model Registry** also belongs here, not Tier 3: it is P0, GPU-free, and fully testable with no
 hardware, so it does not need to wait for the Vision Runtime. It is what the engine cache calls to
-resolve an artifact. (Python â€” see [LANGUAGES.md](LANGUAGES.md).)
+resolve an artifact. (Python â€” see [legacy-languages.md](legacy-languages.md).)
 
 ### Tier 3 â€” Vision Runtime
 Backend abstraction (trt/onnx/torch) Â· engine cache (calls the Model Registry to resolve artifacts,
@@ -428,10 +428,10 @@ Remaining cheap decision with outsized downstream effect:
   Tier 3. Still open.
 
 ~~Settle whether Core owns frame transport.~~ **Resolved 2026-07-28: Core owns it â†’ Core is Rust.**
-See [LANGUAGES.md](LANGUAGES.md) Â§1.
+See [legacy-languages.md](legacy-languages.md) Â§1.
 
 **Next real work, in order:**
-1. Python binding for the **service interface** (the one contract Python still lacks).
+1. Rust binding for Core-facing contracts when the Core port starts.
 2. Decide the model-loading collapse (Â§11.2) â€” blocks Tier 3.
 3. Port `apps/api` to Rust when Core grows real supervision or transport logic â€” not before; order in
-   [LANGUAGES.md](LANGUAGES.md) Â§4.
+   [legacy-languages.md](legacy-languages.md) Â§4.

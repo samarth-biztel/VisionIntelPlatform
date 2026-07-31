@@ -1,13 +1,14 @@
 """Frame envelope -- the canonical frame every source publishes.
 
-Owner: Chetak. Consumed by source services, ML/vision modules, and the Vision
-Runtime. Python binding of ``src/frame-envelope.js``.
+Owner: Chetak. Consumed by source services, ML/vision modules, the Vision
+Runtime, and future core transport. This is the Python binding of the shared
+schema.
 
 A source normalizes (format + calibration) *before* publishing, so every module
 downstream sees this identical shape no matter which physical camera produced
 the frame. See ARCHITECTURE.md section 10.
 
-Targets Python 3.8; see LANGUAGES.md section 3.
+Targets Python 3.8; see docs/legacy-languages.md.
 """
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Union
@@ -124,7 +125,7 @@ def _parse_iso8601(value: str) -> datetime:
 
 
 def utc_now() -> str:
-    """Timestamp in the exact form the JS binding produces."""
+    """Timestamp in the shared ISO-8601 wire format."""
     return (
         datetime.now(timezone.utc)
         .isoformat(timespec="milliseconds")

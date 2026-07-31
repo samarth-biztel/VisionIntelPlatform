@@ -155,7 +155,7 @@ operational load â€” build tooling, debugging, onboarding â€” for two 
 
 **Negotiable**
 - Language per role (current defaults: **Rust core**, Python modules, C++/Python runtime, Tauri UI) â€”
-  see P13 and [LANGUAGES.md](LANGUAGES.md).
+  see P13 and [legacy-languages.md](legacy-languages.md).
 - ~~Whether Core also owns frame transport, or only the control plane.~~ **Settled: Core owns it.**
 - Vision Runtime repo shape â€” separate repo vs. in-tree.
 - Whether the camera SDK is promoted behind a port.
@@ -223,7 +223,7 @@ Unresolved, and each blocks or reshapes work downstream.
    Core is a hot-path component, so its language is **Rust** (not Go), and the separate "hot data
    path" role is absorbed into Core. The invariant "the core never touches a frame" is restated as
    **"the core never *interprets* a frame"** â€” it owns the shared-memory pipe, not the meaning of the
-   pixels in it. See [LANGUAGES.md](LANGUAGES.md) Â§1.
+   pixels in it. See [legacy-languages.md](legacy-languages.md) Â§1.
 2. **Where does the Vision Runtime sit in the startup order?** The current sequence is
    sources â†’ sinks â†’ modules; the Runtime and its port are unplaced.
 3. **Vision Runtime repo shape.** Described as "its own repo/process," drawn in-tree. Pick one.
@@ -234,7 +234,7 @@ Unresolved, and each blocks or reshapes work downstream.
 6. **Camera SDK behind a port?** Only justified if the Windows x86 target becomes real. It already
    publishes by topic, so it can be promoted later without touching a module â€” deferrable.
 7. **How narrow should the language spread be?** See P13. *Partially addressed 2026-07-28:*
-   [LANGUAGES.md](LANGUAGES.md) now records the policy, and the Core-owns-transport decision **removed**
+   [legacy-languages.md](legacy-languages.md) now records the policy, and the Core-owns-transport decision **removed**
    a language by absorbing the C++/Rust hot-path role into a Rust core. Current spread: Rust (core) Â·
    Python (modules, registry, contracts) Â· C++ or Python (Vision Runtime) Â· Tauri/Rust (UI, deferred).
    Still open: whether the Vision Runtime is C++ *or* Python â€” picking Python would cut the spread again.

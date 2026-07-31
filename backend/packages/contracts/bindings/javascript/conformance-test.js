@@ -12,16 +12,19 @@ import {
   frameEnvelopeSchema,
   inferenceRequestSchema,
   inferenceResponseSchema,
+  heartbeatSchema,
   moduleManifestSchema,
   resultEnvelopeSchema,
+  serviceRegistrationSchema,
+  shutdownCommandSchema,
   topicMatches,
   topicNameSchema,
   topicPatternSchema
 } from "./index.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-// bindings/javascript/src -> packages/contracts
-const contractsRoot = path.join(here, "..", "..", "..");
+// bindings/javascript -> packages/contracts
+const contractsRoot = path.join(here, "..", "..");
 const corpus = JSON.parse(
   readFileSync(path.join(contractsRoot, "fixtures", "conformance.json"), "utf8")
 );
@@ -31,7 +34,10 @@ const schemas = {
   result_envelope: resultEnvelopeSchema,
   module_manifest: moduleManifestSchema,
   inference_request: inferenceRequestSchema,
-  inference_response: inferenceResponseSchema
+  inference_response: inferenceResponseSchema,
+  service_registration: serviceRegistrationSchema,
+  service_heartbeat: heartbeatSchema,
+  service_shutdown: shutdownCommandSchema
 };
 
 const failures = [];

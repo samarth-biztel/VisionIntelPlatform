@@ -7,7 +7,7 @@ name = "biztel-contracts"
 version = "0.1.0"
 description = "Vision Intel Platform contracts - Python binding"
 readme = "README.md"
-# 3.8 is the JetPack 5.1 floor; see LANGUAGES.md section 3.
+# 3.8 is the JetPack 5.1 floor; see docs/legacy-languages.md.
 requires-python = ">=3.8"
 dependencies = [
     "pydantic>=2.0,<3",

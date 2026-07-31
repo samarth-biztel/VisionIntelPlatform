@@ -1,6 +1,6 @@
-# 📦 Legacy Notes
+# Legacy Notes
 
-These files are preserved from earlier planning and architecture work. They are useful historical context, but the primary docs are now the numbered files in `docs/`.
+These files are preserved from earlier planning and architecture work. Most are historical context, but [legacy-languages.md](./legacy-languages.md) is still binding for language decisions until it is moved to a non-legacy filename.
 
 The current implementation status for config loading, dependency checks, and lifecycle sequencing is documented in:
 
@@ -12,7 +12,7 @@ The current implementation status for config loading, dependency checks, and lif
 |---|---|
 | [legacy-architecture.md](./legacy-architecture.md) | Earlier architecture notes |
 | [legacy-context.md](./legacy-context.md) | Project context memory |
-| [legacy-languages.md](./legacy-languages.md) | Language binding notes |
+| [legacy-languages.md](./legacy-languages.md) | Binding language policy, known deviations, and porting order |
 | [legacy-memory.md](./legacy-memory.md) | Working memory and constraints |
 | [legacy-problem-statement.md](./legacy-problem-statement.md) | Original problem statement |
 | [assets/module-tracker.xlsx](./assets/module-tracker.xlsx) | Original module tracker spreadsheet |

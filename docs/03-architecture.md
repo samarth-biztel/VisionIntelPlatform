@@ -1,4 +1,4 @@
-# 🏗️ Architecture
+# Architecture
 
 ## Repository Layout
 
@@ -6,8 +6,8 @@
 .
 +-- README.md
 +-- backend/
-|   +-- api/
-|   |   +-- index.js
+|   +-- .cargo/
+|   |   +-- config.toml
 |   +-- config/
 |   |   +-- device.yaml
 |   |   +-- site.yaml
@@ -15,18 +15,17 @@
 |   |   +-- site.json
 |   +-- packages/
 |   |   +-- contracts/
+|   |       +-- fixtures/
+|   |       +-- bindings/
+|   |           +-- javascript/
+|   |           +-- python/
+|   |           +-- rust/
+|   +-- scripts/
+|   |   +-- cargo-gnu.ps1
 |   +-- src/
-|   |   +-- app.js
-|   |   +-- server.js
-|   |   +-- config-loader.js
-|   |   +-- dependency-checker.js
-|   |   +-- registry.js
-|   |   +-- in-memory-bus.js
-|   |   +-- lifecycle-orchestrator.js
-|   |   +-- seed-runtime.js
-|   |   +-- services/
+|   |   +-- main.rs
+|   +-- Cargo.toml
 |   +-- package.json
-|   +-- vercel.json
 +-- frontend/
 |   +-- src/
 |   +-- package.json
@@ -38,22 +37,30 @@
 
 | Layer | Responsibility | Current Files |
 |---|---|---|
-| Contracts | Define schemas and topic rules | `backend/packages/contracts` |
-| Config | Load validated device/site runtime config | `backend/src/config-loader.js`, `backend/config/*.yaml` |
-| Bus / Core | Publish/subscribe, registry, lifecycle, dependency checks | `backend/src` |
-| Source | Produces frame envelopes | `backend/src/services/mock-source.js` |
-| Module | Consumes frames, produces results | `backend/src/services/echo-module.js` |
-| Sink | Consumes result topics | `backend/src/services/log-sink.js` |
-| UI | Operator dashboard | `frontend/src` |
+| Contracts | Define schemas and topic rules through symmetric language bindings and shared fixtures | `backend/packages/contracts` |
+| Config | Load validated device/site runtime config | `backend/src/main.rs`, `backend/config/*.yaml` |
+| Rust Core | HTTP API, publish/subscribe bus, registry, lifecycle, dependency checks | `backend/src/main.rs` |
+| Source | Produces frame envelopes in the seed runtime | `backend/src/main.rs` |
+| Module | Consumes frames and produces results in the seed runtime | `backend/src/main.rs` |
+| Sink | Consumes result topics in the seed runtime | `backend/src/main.rs` |
+| UI | Operator dashboard; web half of the later Tauri app | `frontend/src` |
+
+## Language Policy
+
+[legacy-languages.md](legacy-languages.md) is binding for language choices. The Core is **Rust** because Core owns both supervision and shared-memory frame transport. The current `backend/src/main.rs` implementation now matches that decision.
+
+The operator UI is currently Vite + React in a browser. That is the correct web frontend half of the eventual Tauri desktop UI; the Rust shell is deferred.
+
+Contracts are schemas with bindings, not a JavaScript package that other languages port from. The shared fixture corpus in `backend/packages/contracts/fixtures/conformance.json` is the authority for binding behavior.
 
 ## Data Flow
 
 ```text
 Mock Source
   +-- publishes camera.line1
-###     +-- Echo Module subscribes camera.line1
-###           +-- publishes result.echo
-###                 +-- Log Sink subscribes result.*
+        +-- Echo Module subscribes camera.line1
+              +-- publishes result.echo
+                    +-- Log Sink subscribes result.*
 ```
 
 ## Control Flow
@@ -61,19 +68,19 @@ Mock Source
 ```text
 Service registers
   +-- Registry validates service-registration.v1
-###     +-- Service sends heartbeat
-###           +-- Registry marks fresh/stale/alive
-###                 +-- Dependency checker evaluates readiness
-###                       +-- Dashboard renders state
+        +-- Service sends heartbeat
+              +-- Registry marks fresh/stale/alive
+                    +-- Dependency checker evaluates readiness
+                          +-- Dashboard renders state
 ```
 
 ## Config Flow
 
 ```text
 config/device.yaml + config/site.yaml
-  +-- config-loader validates shape with Zod
-###     +-- seed runtime receives device/site config
-###           +-- dashboard summary exposes loaded_from metadata
+  +-- Rust Core validates shape
+        +-- seed runtime receives device/site config
+              +-- dashboard summary exposes loaded_from metadata
 ```
 
 Config file precedence is:
@@ -91,7 +98,7 @@ Registered services + module manifests + platform config
   +-- check module service roles are running
   +-- check module input topics have publishers
   +-- check module config keys exist
-###     +-- /api/dependencies and /api/dashboard-summary
+        +-- /api/dependencies and /api/dashboard-summary
 ```
 
 ## Lifecycle Flow
@@ -117,7 +124,7 @@ The backend exposes both read-only plans and executable lifecycle commands:
 
 | App | Deploy As | Notes |
 |---|---|---|
-| Backend | Vercel serverless API or Node service | Uses `backend/api/index.js` for Vercel |
-| Frontend | Vercel static site | Uses `frontend/dist` output |
+| Backend Core | Long-running Rust service | Runs from `backend/src/main.rs`; serverless Node entry was removed |
+| Frontend | Vercel static site now, Tauri webview later | Uses `frontend/dist` output |
 
 The apps can be deployed separately. The frontend uses `VITE_API_BASE_URL` when the backend is on another domain.

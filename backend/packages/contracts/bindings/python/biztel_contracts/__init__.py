@@ -5,7 +5,7 @@ several under ``packages/contracts/bindings/`` -- no binding is primary. Every
 binding is held to the same corpus in ``packages/contracts/fixtures``; if two
 disagree on a case, one of them fails its build.
 
-See LANGUAGES.md section 2 for which binding each contract needs and why.
+See docs/legacy-languages.md for which binding each contract needs and why.
 """
 from .bus_topics import (
     CANONICAL_TOPICS,
@@ -43,6 +43,7 @@ from .module_interface import (
     UiPanel,
 )
 from .result_envelope import ModelRef, ResultEnvelope, ResultError
+from .service_interface import ServiceHeartbeat, ServiceRegistration, ShutdownCommand
 
 __version__ = "0.1.0"
 
@@ -79,6 +80,10 @@ __all__ = [
     "ModuleLifecycle",
     "UiPanel",
     "MODULE_LIFECYCLE_NAMES",
+    # service interface
+    "ServiceRegistration",
+    "ServiceHeartbeat",
+    "ShutdownCommand",
     # inference contract
     "InferenceRequest",
     "InferenceResponse",

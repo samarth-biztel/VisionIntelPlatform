@@ -1,9 +1,9 @@
 """Bus topic naming convention.
 
 Owner: Samarth (the rule itself). This module is the Python *binding* of that
-rule -- it must accept and reject exactly what ``src/bus-topics.js`` does.
+rule -- it must accept and reject exactly what the shared fixtures require.
 
-Targets Python 3.8; see LANGUAGES.md section 3.
+Targets Python 3.8; see docs/legacy-languages.md.
 """
 import re
 from typing import List

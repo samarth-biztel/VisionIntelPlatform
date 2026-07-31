@@ -2,9 +2,9 @@
  * Runs every language binding against the shared fixture corpus.
  *
  * The JS binding always runs. The Python binding runs wherever a usable
- * interpreter exists -- so drift is caught on any dev box that has Python,
- * and CI (where both are installed) enforces it for real. A machine with no
- * Python is warned, loudly, rather than blocked.
+ * interpreter exists -- so drift is caught on dev boxes that have Python,
+ * and CI can enforce it for real. A machine with no Python is warned,
+ * loudly, rather than blocked.
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
@@ -17,23 +17,33 @@ function run(label, command, args) {
   return { label, ...result };
 }
 
+function findPython() {
+  for (const command of ["python3", "python", "py"]) {
+    const result = spawnSync(command, ["-c", "import pydantic"], { stdio: "ignore" });
+    if (result.status === 0) {
+      return command;
+    }
+  }
+  return null;
+}
+
 const js = run("js", process.execPath, [
-  path.join(here, "bindings", "javascript", "src", "conformance-test.js")
+  path.join(here, "bindings", "javascript", "conformance-test.js")
 ]);
 if (js.status !== 0) {
   process.exit(js.status ?? 1);
 }
 
-const probe = spawnSync("python3", ["-c", "import pydantic"], { stdio: "ignore" });
+const python = findPython();
 
-if (probe.status !== 0) {
+if (python === null) {
   console.warn(
-    "python contracts: SKIPPED (no python3 with pydantic on this machine).\n" +
+    "python contracts: SKIPPED (no python3/python/py with pydantic on this machine).\n" +
       "  The Python binding was NOT verified against the shared fixtures.\n" +
       "  Run `npm run test:python --workspace @biztel/contracts` where Python is available."
   );
 } else {
-  const py = run("python", "python3", [
+  const py = run("python", python, [
     path.join(here, "bindings", "python", "conformance_test.py")
   ]);
   if (py.status !== 0) {

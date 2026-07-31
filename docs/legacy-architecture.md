@@ -478,8 +478,8 @@ flexible.
 Modules can be written in **any language** because they only speak the bus wire format â€” nothing links
 another component's code. Each role's constraints pick a natural default:
 
-> **Canonical language policy now lives in [LANGUAGES.md](LANGUAGES.md).** This table is kept in sync
-> with it; if the two ever disagree, LANGUAGES.md wins.
+> **Canonical language policy now lives in [legacy-languages.md](legacy-languages.md).** This table is kept in sync
+> with it; if the two ever disagree, legacy-languages.md wins.
 
 | Role | Language | Why |
 |---|---|---|

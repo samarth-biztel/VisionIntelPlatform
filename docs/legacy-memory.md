@@ -125,7 +125,7 @@ The two things that cost real time on JP5â†’JP6: finding the JP6 wheels, an
 (Vision Runtime â€” the one genuinely per-platform piece) Â· Python (ML/vision modules) Â· any language
 (logic modules like Crowning) Â· Tauri = web frontend + Rust shell (desktop UI).
 
-Full policy, including which contract needs which binding: [LANGUAGES.md](LANGUAGES.md).
+Full policy, including which contract needs which binding: [legacy-languages.md](legacy-languages.md).
 
 They coexist because the **bus contract is the only thing they share** â€” messages, never code.
 
@@ -170,7 +170,7 @@ interface. They unblock all parallel work. Full build order: [CONTEXT.md](CONTEX
 
 - ~~**Does Core own frame transport?**~~ **Settled 2026-07-28: yes.** Core owns the shared-memory hot
   path, which makes Core **Rust** and absorbs the separate "hot data path" role. See
-  [LANGUAGES.md](LANGUAGES.md) Â§1.
+  [legacy-languages.md](legacy-languages.md) Â§1.
 - ~~**Collapse the three overlapping model-loading items.**~~ **Settled 2026-07-28:** GPU-free **Model
   Registry** (catalog/version/compatibility/artifact selection, P0, Python) + Vision Runtime **engine
   cache** (loading/CUDA/sharing, P1). **Per-module model loading deleted.** Registry selects from a

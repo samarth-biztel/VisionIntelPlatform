@@ -1,10 +1,10 @@
-﻿# biztel-contracts â€” Python binding
+# biztel-contracts - Python binding
 
 The Python side of the platform contracts. This is what **AI Supervisor, Image Inspection, OCR,
 Crowning, and the Vision Runtime** import.
 
 Targets **Python 3.8** (the JetPack 5.1 floor) and runs unchanged on JetPack 6 (3.10) and Windows
-(3.11). See [LANGUAGES.md](../../../../LANGUAGES.md) Â§3.
+(3.11). See [legacy-languages.md](../../../../../docs/legacy-languages.md).
 
 ```bash
 pip install -e packages/contracts/bindings/python
@@ -20,6 +20,7 @@ pip install -e packages/contracts/bindings/python
 | Result envelope | `biztel_contracts.result_envelope` | Chetak |
 | Module interface + manifest | `biztel_contracts.module_interface` | Chetak |
 | Inference contract | `biztel_contracts.inference_contract` | Chetak |
+| Service interface | `biztel_contracts.service_interface` | Samarth |
 | Bus topic naming | `biztel_contracts.bus_topics` | Samarth (rule) |
 
 ---
@@ -87,7 +88,7 @@ class AiSupervisor(Module):
 
 `make_result()` fills in `frame_id`, `source_topic`, `result_topic`, and `module_id` for you, so a
 module cannot accidentally break traceability. Return `None` from `on_frame` to publish nothing for
-that frame â€” deciding *when* to infer is the module's job.
+that frame -- deciding *when* to infer is the module's job.
 
 ---
 
@@ -103,20 +104,17 @@ that frame â€” deciding *when* to infer is the module's job.
 
 ## Conformance
 
-Both language bindings run the **same** fixture corpus, `../../fixtures/conformance.json`:
+All language bindings run the **same** fixture corpus, `../../fixtures/conformance.json`:
 
 ```bash
-python3 packages/contracts/bindings/python/conformance_test.py   # python binding
-node packages/contracts/bindings/javascript/src/conformance-test.js   # js binding
+python packages/contracts/bindings/python/conformance_test.py   # python binding
+node packages/contracts/bindings/javascript/conformance-test.js   # js binding
 npm run test --workspace @biztel/contracts               # both
 ```
 
-74 shared cases run identically on both sides. If a binding drifts â€” accepts something the other
-rejects â€” its build fails naming the exact case. Adding a case to the JSON automatically holds every
-binding to it.
+If a binding drifts and accepts something the corpus rejects, or rejects something the corpus accepts,
+its build fails naming the exact case. Adding a case to the JSON automatically holds every binding to
+it. Rust and C++ bindings must join this same fixture suite when those consumers are added.
 
-This is success test **S8** in [PROBLEM_STATEMENT.md](../../../../PROBLEM_STATEMENT.md): contract
+This is success test **S8** in [legacy-problem-statement.md](../../../../../docs/legacy-problem-statement.md): contract
 conformance asserted automatically, against synthetic data, with no hardware attached.
-
-
-

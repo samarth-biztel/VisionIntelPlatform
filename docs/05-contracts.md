@@ -1,8 +1,8 @@
-# 📜 Contracts
+# Contracts
 
 ## Why Contracts Exist
 
-Contracts make all modules and services speak the same language. A service can be written in JavaScript, Python, or another language later, but it must still follow the same schema.
+Contracts make all modules and services speak the same language without sharing implementation code. A contract is a schema plus language bindings. The shared fixture corpus is the authority, so JavaScript, Python, Rust, and future C++ bindings must accept and reject the same cases.
 
 ## Main Contracts
 
@@ -35,13 +35,13 @@ Example shape:
   "owner": "Vision Intel Platform",
   "kind": "logic",
   "needs": {
-### "input_topics": ["camera.line1"],
-### "models": [],
-### "config_keys": ["site.enabled_modules"],
-### "services": []
+    "input_topics": ["camera.line1"],
+    "models": [],
+    "config_keys": ["site.enabled_modules"],
+    "services": []
   },
   "provides": {
-### "result_topics": ["result.echo"]
+    "result_topics": ["result.echo"]
   }
 }
 ```
@@ -84,7 +84,11 @@ The bus supports exact topics and prefix wildcard patterns:
 
 | Binding | Location | Status |
 |---|---|---|
-| JavaScript | `backend/packages/contracts/bindings/javascript` | Active |
-| Python | `backend/packages/contracts/bindings/python` | Schema binding present |
+| JavaScript | `backend/packages/contracts/bindings/javascript` | Active for JavaScript consumers and UI-facing checks |
+| Python | `backend/packages/contracts/bindings/python` | Active for ML/vision modules and Vision Runtime-facing code |
+| Rust | `backend/packages/contracts/bindings/rust` | Active for the Rust Core |
+| C++ | TBD | Pending; add when the Vision Runtime needs a native binding |
 
-The JavaScript contract conformance test runs in backend builds. Python verification requires a Python environment with Pydantic installed.
+No binding is primary. `backend/packages/contracts/fixtures/conformance.json` is the shared truth, and each binding must pass the same cases.
+
+The backend build runs JavaScript, Python, and Rust contract/backend checks. Python code targets 3.8, so annotations use `Optional`, `Union`, `List`, and `Dict` instead of newer syntax.

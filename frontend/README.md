@@ -1,8 +1,10 @@
-# 🎛️ Frontend
+# Frontend
+
+This React/Vite app is the web frontend half of the future Tauri desktop UI. The Rust shell is deferred by the binding language policy in [../docs/legacy-languages.md](../docs/legacy-languages.md).
 
 The frontend is the React operator dashboard for the Vision Intel Platform.
 
-## 📁 Contents
+## Contents
 
 | Path | Purpose |
 |---|---|
@@ -12,7 +14,7 @@ The frontend is the React operator dashboard for the Vision Intel Platform.
 | `src/lib/api.js` | API client with offline fallback |
 | `src/data/fallback-summary.js` | Local fallback dashboard state |
 
-## 🚀 Commands
+## Commands
 
 ```bash
 npm install
@@ -21,13 +23,13 @@ npm run build
 npm run preview
 ```
 
-## 🌐 Local URL
+## Local URL
 
 ```text
 http://localhost:5173
 ```
 
-## 🔌 Backend URL
+## Backend URL
 
 For separate Vercel deployments, set:
 

@@ -1,7 +1,7 @@
 """Module interface -- what every module service implements, plus its manifest.
 
-Python binding of the JavaScript module manifest contract. A module declares
-what it needs, what it provides, and the lifecycle hooks the core can call.
+Python binding of the shared module manifest schema. A module declares what it
+needs, what it provides, and the lifecycle hooks the core can call.
 """
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional

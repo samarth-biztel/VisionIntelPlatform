@@ -1,5 +1,5 @@
 {
-  "_comment": "Shared contract conformance corpus. Every language binding runs this exact file and must agree case for case. See LANGUAGES.md section 2 and PROBLEM_STATEMENT.md S8.",
+  "_comment": "Shared contract conformance corpus. Every language binding runs this exact file and must agree case for case. See docs/legacy-languages.md and docs/legacy-problem-statement.md S8.",
   "frame_envelope": {
     "valid": [
       {
@@ -519,7 +519,153 @@
       }
     ]
   },
-  "inference_request": {
+  "service_registration": {
+    "valid": [
+      {
+        "_name": "core supervisor",
+        "schema_version": "service-registration.v1",
+        "service_id": "core",
+        "display_name": "Core Supervisor",
+        "role": "core",
+        "version": "0.1.0",
+        "host_id": "dev-workstation",
+        "process_id": 1001,
+        "subscribes": ["health.heartbeat"],
+        "publishes": ["event.service.registered"],
+        "health_topic": "health.heartbeat",
+        "started_at_utc": "2026-07-28T12:00:00.000Z",
+        "metadata": { "seed": true, "slot": 1, "profile": "dev" }
+      },
+      {
+        "_name": "sink subscribes by wildcard",
+        "schema_version": "service-registration.v1",
+        "service_id": "log-sink",
+        "display_name": "Log Sink",
+        "role": "sink",
+        "version": "0.1.0",
+        "host_id": "dev-workstation",
+        "subscribes": ["result.*"],
+        "publishes": [],
+        "started_at_utc": "2026-07-28T12:00:00.000Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "unknown role",
+        "schema_version": "service-registration.v1",
+        "service_id": "svc",
+        "display_name": "Service",
+        "role": "broker",
+        "version": "0.1.0",
+        "host_id": "dev-workstation",
+        "started_at_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "publishes wildcard topic",
+        "schema_version": "service-registration.v1",
+        "service_id": "bad-publisher",
+        "display_name": "Bad Publisher",
+        "role": "sink",
+        "version": "0.1.0",
+        "host_id": "dev-workstation",
+        "publishes": ["result.*"],
+        "started_at_utc": "2026-07-28T12:00:00.000Z"
+      },
+      {
+        "_name": "timestamp without timezone",
+        "schema_version": "service-registration.v1",
+        "service_id": "svc",
+        "display_name": "Service",
+        "role": "core",
+        "version": "0.1.0",
+        "host_id": "dev-workstation",
+        "started_at_utc": "2026-07-28T12:00:00"
+      },
+      {
+        "_name": "negative process id",
+        "schema_version": "service-registration.v1",
+        "service_id": "svc",
+        "display_name": "Service",
+        "role": "core",
+        "version": "0.1.0",
+        "host_id": "dev-workstation",
+        "process_id": -1,
+        "started_at_utc": "2026-07-28T12:00:00.000Z"
+      }
+    ]
+  },
+  "service_heartbeat": {
+    "valid": [
+      {
+        "_name": "running heartbeat",
+        "schema_version": "service-heartbeat.v1",
+        "service_id": "core",
+        "state": "running",
+        "timestamp_utc": "2026-07-28T12:00:01.000Z",
+        "uptime_ms": 1000,
+        "message": "ok",
+        "metrics": { "fps": 30.0, "queue_depth": 0 }
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "unknown state",
+        "schema_version": "service-heartbeat.v1",
+        "service_id": "core",
+        "state": "paused",
+        "timestamp_utc": "2026-07-28T12:00:01.000Z",
+        "uptime_ms": 1000,
+        "metrics": {}
+      },
+      {
+        "_name": "negative uptime",
+        "schema_version": "service-heartbeat.v1",
+        "service_id": "core",
+        "state": "running",
+        "timestamp_utc": "2026-07-28T12:00:01.000Z",
+        "uptime_ms": -1,
+        "metrics": {}
+      },
+      {
+        "_name": "metric is not numeric",
+        "schema_version": "service-heartbeat.v1",
+        "service_id": "core",
+        "state": "running",
+        "timestamp_utc": "2026-07-28T12:00:01.000Z",
+        "uptime_ms": 1000,
+        "metrics": { "fps": "fast" }
+      }
+    ]
+  },
+  "service_shutdown": {
+    "valid": [
+      {
+        "_name": "operator requested shutdown",
+        "schema_version": "service-shutdown.v1",
+        "service_id": "echo",
+        "reason": "operator_requested",
+        "requested_by": "operator",
+        "timestamp_utc": "2026-07-28T12:00:02.000Z"
+      }
+    ],
+    "invalid": [
+      {
+        "_name": "empty reason",
+        "schema_version": "service-shutdown.v1",
+        "service_id": "echo",
+        "reason": "",
+        "requested_by": "operator",
+        "timestamp_utc": "2026-07-28T12:00:02.000Z"
+      },
+      {
+        "_name": "missing requested_by",
+        "schema_version": "service-shutdown.v1",
+        "service_id": "echo",
+        "reason": "operator_requested",
+        "timestamp_utc": "2026-07-28T12:00:02.000Z"
+      }
+    ]
+  },  "inference_request": {
     "valid": [
       {
         "_name": "ai supervisor calling the runtime",

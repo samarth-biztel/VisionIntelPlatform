@@ -1,35 +1,34 @@
-# ☁️ Deployment
+# Deployment
 
 ## Deployment Model
 
-The project is intentionally split into two deployable apps:
+The project is split into two deployable apps:
 
-| App | Folder | Vercel Root Directory |
+| App | Folder | Deploy Shape |
 |---|---|---|
-| Backend | `backend/` | `backend` |
-| Frontend | `frontend/` | `frontend` |
+| Rust Core backend | `backend/` | Long-running Rust service |
+| Frontend web app | `frontend/` | Static Vite build now, Tauri shell later |
 
-Deploy them as two Vercel projects for the cleanest setup.
+The frontend can still be deployed as a Vercel static site. The backend is no longer a Node serverless function; it should run as a persistent Rust service because the Core owns supervision and the future frame transport path.
 
-## Backend on Vercel
+## Backend Service
 
-### Settings
+### Build And Run
 
-| Setting | Value |
-|---|---|
-| Root Directory | `backend` |
-| Install Command | `npm install` |
-| Build Command | `npm run build` |
-| Output Directory | leave empty |
-
-The backend has:
-
-```text
-backend/api/index.js
-backend/vercel.json
+```bash
+cd backend
+npm install
+npm run build
+npm run start
 ```
 
-Vercel uses `api/index.js` as the serverless API function.
+`npm run start` launches the Rust API on:
+
+```text
+http://localhost:7080
+```
+
+The npm scripts are compatibility wrappers around Cargo. On Windows they call `scripts/cargo-gnu.ps1`, which uses the `stable-x86_64-pc-windows-gnu` Rust toolchain.
 
 ## Backend Config Files
 
@@ -68,10 +67,10 @@ frontend/vercel.json
 
 ## Connecting Frontend to Backend
 
-If backend and frontend are separate domains, add this environment variable to the frontend Vercel project:
+If backend and frontend are separate domains, add this environment variable to the frontend project:
 
 ```text
-VITE_API_BASE_URL=https://your-backend-domain.vercel.app
+VITE_API_BASE_URL=https://your-backend-domain.example
 ```
 
 If you later deploy both behind the same domain, the frontend can use relative `/api` routes without this variable.
@@ -109,7 +108,7 @@ cd backend
 npm run build
 ```
 
-This runs JavaScript contract checks, shared fixture conformance, the Tier 1 loop test, and API startup validation. Python contract verification is skipped when Python with Pydantic is not available.
+This runs JavaScript contract checks, Python contract checks, Rust backend tests, and a Rust API startup check.
 
 Run frontend checks before deploying frontend changes:
 
@@ -122,10 +121,10 @@ npm run build
 
 | Concern | Recommendation |
 |---|---|
-| Long-running hardware services | Prefer a Node service/edge box instead of pure serverless |
-| In-memory bus | Replace with Redis/NATS/Kafka/MQTT for multi-instance deployments |
+| Long-running hardware services | Run the Rust Core as a persistent edge-box or server service |
+| In-memory bus | Replace or back with production transport when distributed deployment needs it |
 | Lifecycle execution | Use persistent audit logs before exposing operator controls in production |
 | Dependency reports | Persist snapshots once a database is introduced |
 | Heartbeats | Persist history once database is introduced |
 | Camera frames | Store heavy assets outside the API process |
-| Secrets | Use Vercel environment variables, never committed `.env` files |
+| Secrets | Use environment variables, never committed `.env` files |

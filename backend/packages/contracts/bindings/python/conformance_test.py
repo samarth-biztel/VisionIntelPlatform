@@ -4,7 +4,7 @@ Runs the shared corpus in ``packages/contracts/fixtures/conformance.json``.
 Every other binding runs that same file. If two bindings ever disagree on a
 case, one of them fails its build -- the point (PROBLEM_STATEMENT.md S8, P11).
 
-Run: python3 packages/contracts/bindings/python/conformance_test.py
+Run: python packages/contracts/bindings/python/conformance_test.py
 """
 import json
 import os
@@ -19,6 +19,9 @@ from biztel_contracts import (  # noqa: E402
     Module,
     ModuleManifest,
     ResultEnvelope,
+    ServiceHeartbeat,
+    ServiceRegistration,
+    ShutdownCommand,
     create_mock_frame,
     is_topic,
     is_topic_pattern,
@@ -35,6 +38,9 @@ MODELS = {
     "module_manifest": ModuleManifest,
     "inference_request": InferenceRequest,
     "inference_response": InferenceResponse,
+    "service_registration": ServiceRegistration,
+    "service_heartbeat": ServiceHeartbeat,
+    "service_shutdown": ShutdownCommand,
 }
 
 failures = []
