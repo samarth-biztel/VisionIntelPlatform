@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 run",
-    "start": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 run",
+    "dev": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 run --bin core",
+    "start": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 run --bin core",
     "test": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 test",
-    "check": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 run -- --check",
+    "check": "powershell -ExecutionPolicy Bypass -File scripts/cargo-gnu.ps1 run --bin core -- --check",
     "build": "npm run build --workspace @biztel/contracts && npm run test && npm run check"
   },
   "workspaces": [

@@ -55,10 +55,12 @@ __pycache__/
 venv/
 
 # Native / platform build artifacts for future runtime work
+target/
 *.o
 *.obj
 *.dll
 *.so
 *.dylib
 *.exe
+
 
