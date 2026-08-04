@@ -28,12 +28,12 @@ path = "api/dashboard-summary.rs"
 required-features = ["vercel"]
 
 [[bin]]
-name = "lifecycle-startup"
+name = "startup"
 path = "api/lifecycle/startup.rs"
 required-features = ["vercel"]
 
 [[bin]]
-name = "lifecycle-shutdown"
+name = "shutdown"
 path = "api/lifecycle/shutdown.rs"
 required-features = ["vercel"]
 
@@ -41,6 +41,7 @@ required-features = ["vercel"]
 codegen-units = 1
 lto = "fat"
 opt-level = 3
+
 
 
 
