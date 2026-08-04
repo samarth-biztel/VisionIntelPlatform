@@ -1,11 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install",
-  "buildCommand": "cargo build --release --bins --features vercel",
-  "functions": {
-    "api/**/*.rs": {
-      "runtime": "vercel-rust@4.0.8"
-    }
-  }
+  "buildCommand": "echo Backend API functions ready",
+  "outputDirectory": "public"
 }
-
