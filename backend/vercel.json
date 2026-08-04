@@ -1,10 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install",
-  "buildCommand": "cargo build --release --bin api --features vercel",
+  "buildCommand": "cargo build --release --bins --features vercel",
   "functions": {
     "api/**/*.rs": {
       "runtime": "vercel-rust@4.0.8"
     }
   }
 }
+

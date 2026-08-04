@@ -9,10 +9,15 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn handler(req: Request) -> Result<Response<Body>, Error> {
-    let api_response = backend_core::handle_api_request(req.method().as_str(), req.uri().path());
+    respond(backend_core::handle_api_request(
+        req.method().as_str(),
+        "/api/health",
+    ))
+}
+
+fn respond(api_response: backend_core::ApiResponse) -> Result<Response<Body>, Error> {
     let status =
         StatusCode::from_u16(api_response.status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
-
     Ok(Response::builder()
         .status(status)
         .header("Content-Type", "application/json")

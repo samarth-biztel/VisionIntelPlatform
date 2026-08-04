@@ -18,14 +18,30 @@ name = "core"
 path = "src/main.rs"
 
 [[bin]]
-name = "api"
-path = "api/[...path].rs"
+name = "health"
+path = "api/health.rs"
+required-features = ["vercel"]
+
+[[bin]]
+name = "dashboard-summary"
+path = "api/dashboard-summary.rs"
+required-features = ["vercel"]
+
+[[bin]]
+name = "lifecycle-startup"
+path = "api/lifecycle/startup.rs"
+required-features = ["vercel"]
+
+[[bin]]
+name = "lifecycle-shutdown"
+path = "api/lifecycle/shutdown.rs"
 required-features = ["vercel"]
 
 [profile.release]
 codegen-units = 1
 lto = "fat"
 opt-level = 3
+
 
 
 
